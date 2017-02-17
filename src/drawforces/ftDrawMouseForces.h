@@ -16,6 +16,7 @@ namespace flowTools {
 		void				setup(int _simulationWidth, int _simulationHeight, int _densityWidth = 0, int _densityHeight = 0) ;
 		void				update(float _deltaTime);
 		void				reset()  { for (int i=0; i<numDrawForces; i++) drawForces[i].reset(); }
+		void				invertForce(int _index);
 		
 		int					getNumForces() { return numDrawForces; }
 		
@@ -27,6 +28,7 @@ namespace flowTools {
 //		ofParameterGroup	parameters;
 		ofParameterGroup	leftButtonParameters;
 		ofParameterGroup	rightButtonParameters;
+		ofParameterGroup	middleButtonParameters;
 		
 	private:
 		ofParameter<bool>	doResetDrawForces;

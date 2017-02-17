@@ -80,6 +80,8 @@ namespace flowTools {
 		switch (type) {
 			case FT_VELOCITY:
 				typeForce *= ofVec4f(width, height, 0, 1);
+				// velocity hack below
+				//typeForce = ofVec4f(abs(1.f - typeForce.x), abs(1.f - typeForce.y), 0, 1);
 				break;
 			case FT_PRESSURE:
 				typeForce *= ofVec4f(100, 0, 0, 1);
@@ -95,12 +97,40 @@ namespace flowTools {
 		}
 		
 		ofPushStyle();
-		ofEnableBlendMode(OF_BLENDMODE_ADD);
-		drawForceShader.update(forceBuffer,
-								typeForce,
-								absolutePosition,
-								absoluteRadius,
-								edge);
+		
+		if (type == FT_DENSITY)
+		{
+			//ofClear(ofColor(255.f, 255.f, 255.f, 255.f));
+			ofEnableBlendMode(OF_BLENDMODE_ADD);
+			//ofEnableBlendMode(OF_BLENDMODE_DISABLED);
+			//glEnable(GL_BLEND);
+			//glBlendEquation(GL_FUNC_ADD);
+			//glBlendFunc(GL_SRC_ALPHA, GL_CONSTANT_COLOR);
+			//glBlendColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+			//glEnable(GL_ALPHA_TEST);
+			//glAlphaFunc(GL_GREATER, 0);
+
+			drawForceShader.update(forceBuffer,
+				typeForce,
+				absolutePosition,
+				absoluteRadius,
+				edge,
+				1.0f);
+		}
+		else
+		{
+			ofEnableBlendMode(OF_BLENDMODE_DISABLED);
+
+			drawForceShader.update(forceBuffer,
+				typeForce,
+				absolutePosition,
+				absoluteRadius,
+				edge,
+				0.0f);
+		}
+
+
 	
 		ofPopStyle();
 		forceApplied = true;

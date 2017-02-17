@@ -53,6 +53,8 @@ namespace flowTools {
 		void	setSize(float value) { size.set(value); }
 		void	setSizeSpread(float value) { sizeSpread.set(value); }
 		void	setGravity(ofVec2f value) { gravity.set(value); }
+
+		void	invert() { color.set(ofVec3f(1.0 - color.get().x, 1.0 - color.get().y, 1.0 - color.get().z)); }
 		
 		ofParameterGroup parameters;
 	private:
@@ -69,6 +71,7 @@ namespace flowTools {
 		ofParameter<float>	sizeSpread;
 		ofParameter<float>	twinkleSpeed;
 		ofParameter<ofVec2f>gravity;
+		ofParameter<ofVec3f>color;
 		
 		float	simulationWidth;
 		float	simulationHeight;

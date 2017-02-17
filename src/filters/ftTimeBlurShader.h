@@ -206,8 +206,6 @@ namespace flowTools {
 			ofPopStyle();
 		}
 		
-		void reset() { pingPong.black(); }
-		
 	protected:
 		
 		void allocate(int _width, int _height, int _internalFormat = GL_RGBA){

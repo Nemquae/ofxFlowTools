@@ -4,6 +4,8 @@
 #include "ofMain.h"
 #include "ftFbo.h"
 #include "ftSwapBuffer.h"
+#include "ftMixForceShader.h"
+#include "ftInvertColorShader.h"
 #include "ftDiffuseShader.h"
 #include "ftAdvectShader.h"
 #include "ftDivergenceShader.h"
@@ -33,11 +35,13 @@ namespace flowTools {
 		
 		void	reset();
 		void	resetBackground();
+		bool	isInverted() { return doInvert.get(); }
+		void	invert() { doInvert.set(!doInvert.get()); }
 		
-		void    addDensity(ofTexture& _tex, float _strength  = 1.0);
-		void    addVelocity(ofTexture& _tex, float _strength  = 1.0);
-		void    addTemperature(ofTexture& _tex, float _strength  = 1.0);
-		void    addPressure(ofTexture& _tex, float _strength  = 1.0);
+		void    addDensity(ofTexture& _tex, float _strength  = 1.0, bool _invert = false);
+		void    addVelocity(ofTexture& _tex, float _strength  = 1.0, bool _invert = false);
+		void    addTemperature(ofTexture& _tex, float _strength  = 1.0, bool _invert = false);
+		void    addPressure(ofTexture& _tex, float _strength  = 1.0, bool _invert = false);
 		void    addObstacle(ofTexture& _tex);
 		void    addTempObstacle(ofTexture& _tex);
 		
@@ -101,6 +105,7 @@ namespace flowTools {
 		
 	private:
 		ofParameter<bool>	doReset;
+		ofParameter<bool>	doInvert;
 		ofParameter<float>	speed;
 		ofParameter<float>	cellSize;
 		ofParameter<int>	numJacobiIterations;
@@ -123,7 +128,10 @@ namespace flowTools {
 		ofParameter<float>	maxTemperature;
 		ofParameter<float>	densityFromPressure;
 		ofParameter<float>	densityFromVorticity;
+
 		
+		ftMixForceShader		mixForceShader;
+		ftInvertColorShader		invertColorShader;
 		ftDiffuseShader			diffuseShader;
 		ftAdvectShader			advectShader;
 		ftDivergenceShader		divergenceShader;
@@ -137,6 +145,8 @@ namespace flowTools {
 		ftDensityFloatMultiplier	densityFloatMultiplierShader;
 		ftDensityVec2Multiplier		densityVec2MultiplierShader;
 				
+		ftSwapBuffer	whiteSwapBuffer;
+		ftSwapBuffer	colorSwapBuffer;
 		ftSwapBuffer	densitySwapBuffer;
 		ftSwapBuffer	velocitySwapBuffer;
 		ftSwapBuffer	temperatureSwapBuffer;

@@ -42,6 +42,7 @@ namespace flowTools {
 		
 		parameters.setName("fluid solver");
 		parameters.add(doReset.set("reset", false));
+		parameters.add(doInvert.set("invert", false));
 		parameters.add(speed.set("speed", 20, 0, 100));
 		parameters.add(cellSize.set("cell size", 1.25, 0.0, 2.0));
 		parameters.add(numJacobiIterations.set("iterations", 40, 1, 100));
@@ -81,6 +82,10 @@ namespace flowTools {
 		int	interformatPressure = GL_R32F;
 		int	internalFormatObstacle = GL_R8;
 			
+		whiteSwapBuffer.allocate(densityWidth, densityHeight, internalFormatDensity);
+		whiteSwapBuffer.black();
+		colorSwapBuffer.allocate(densityWidth, densityHeight, internalFormatDensity);
+		colorSwapBuffer.black();
 		densitySwapBuffer.allocate(densityWidth,densityHeight,internalFormatDensity);
 		densitySwapBuffer.black();
 		velocitySwapBuffer.allocate(simulationWidth,simulationHeight,internalFormatVelocity);
@@ -128,8 +133,33 @@ namespace flowTools {
 			doReset.set(false);
 			reset();
 		}
+
+		//whiteSwapBuffer.white();
+
+		//colorSwapBuffer.black();
+
+		//mixForceShader.update(*whiteSwapBuffer.getBuffer(), whiteSwapBuffer.getBackTexture(), ofFloatColor(1.0,0.0));
+		//whiteSwapBuffer.swap();
+
+		//invertColorShader.update(*whiteSwapBuffer.getBuffer(), whiteSwapBuffer.getBackTexture());
+		//whiteSwapBuffer.swap();
+
+		//addShader.update(*colorSwapBuffer.getBuffer(),
+		//	colorSwapBuffer.getBackTexture(),
+		//	//_tex,
+		//	whiteSwapBuffer.getBackTexture(),
+		//	1.0);
+		//colorSwapBuffer.swap();
+
+		//invertColorShader.update(*whiteSwapBuffer.getBuffer(), whiteSwapBuffer.getBackTexture());
+		//whiteSwapBuffer.swap();
+
+		//mixForceShader.update(*whiteSwapBuffer.getBuffer(), whiteSwapBuffer.getBackTexture(), ofFloatColor(0.0, 0.0));
+		//whiteSwapBuffer.swap();
 		
 		ofPushStyle();
+
+		//ofClear(ofColor(255, 255, 255, 255));
 		
 		ofEnableBlendMode(OF_BLENDMODE_DISABLED);
 		// OBSTACLE BUFFER;
@@ -198,6 +228,9 @@ namespace flowTools {
 							cellSize.get());
 		velocitySwapBuffer.swap();
 		
+		//invertColorShader.update(*densitySwapBuffer.getBuffer(),
+		//	densitySwapBuffer.getBackTexture());
+
 		advectShader.update(*densitySwapBuffer.getBuffer(),
 							densitySwapBuffer.getBackTexture(),
 							velocitySwapBuffer.getBackTexture(),
@@ -205,6 +238,10 @@ namespace flowTools {
 							timeStep,
 							1.0 - (dissipation.get() + densityOffset.get()),
 							cellSize.get());
+
+		//invertColorShader.update(*densitySwapBuffer.getBuffer(),
+		//	densitySwapBuffer.getBackTexture());
+
 		densitySwapBuffer.swap();
 
 		
@@ -269,18 +306,33 @@ namespace flowTools {
 		
 		// Multiply density by pressure and or vorticity
 		if(densityFromPressure != 0) {
+
+			//invertColorShader.update(*densitySwapBuffer.getBuffer(),
+			//	densitySwapBuffer.getBackTexture());
+
 			densityFloatMultiplierShader.update(*densitySwapBuffer.getBuffer(),
 												densitySwapBuffer.getBackTexture(),
 												pressureSwapBuffer.getBackTexture(),
 												densityFromPressure.get());
+
+			//invertColorShader.update(*densitySwapBuffer.getBuffer(),
+			//	densitySwapBuffer.getBackTexture());
+
 			densitySwapBuffer.swap();
 		}
 		
 		if(densityFromVorticity != 0) {
+			//invertColorShader.update(*densitySwapBuffer.getBuffer(),
+			//	densitySwapBuffer.getBackTexture());
+
 			densityVec2MultiplierShader.update(*densitySwapBuffer.getBuffer(),
 											   densitySwapBuffer.getBackTexture(),
 											   vorticitySecondPassBuffer.getTexture(),
 											   -densityFromVorticity.get());
+
+			//invertColorShader.update(*densitySwapBuffer.getBuffer(),
+			//	densitySwapBuffer.getBackTexture());
+
 			densitySwapBuffer.swap();
 		}
 		
@@ -301,58 +353,188 @@ namespace flowTools {
 									   combinedObstacleBuffer.getTexture(),
 									   cellSize.get());
 		velocitySwapBuffer.swap();
+
+		//colorSwapBuffer.black();
+
+		//addShader.update(*colorSwapBuffer.getBuffer(), colorSwapBuffer.getBackTexture(), whiteSwapBuffer.getBackTexture(), 1.0);
+		//colorSwapBuffer.swap();
+
+		if (doInvert.get())
+		{
+			invertColorShader.update(*colorSwapBuffer.getBuffer(),
+				//	colorSwapBuffer.getBackTexture());
+				densitySwapBuffer.getBackTexture());
+			colorSwapBuffer.swap();
+		}
+		else
+		{
+			colorSwapBuffer.black();
+			addShader.update(*colorSwapBuffer.getBuffer(), colorSwapBuffer.getBackTexture(), densitySwapBuffer.getBackTexture(), 1.0f);
+			colorSwapBuffer.swap();
+		}
+
+		//colorSwapBuffer.black();
+
 		
 		ofPopStyle();
 	}
 	
 	//--------------------------------------------------------------
-	void ftFluidSimulation::addDensity(ofTexture & _tex, float _strength){
+	void ftFluidSimulation::addDensity(ofTexture & _tex, float _strength, bool _invert){
 		ofPushStyle();
 		ofEnableBlendMode(OF_BLENDMODE_DISABLED);
-		addShader.update(*densitySwapBuffer.getBuffer(),
-						 densitySwapBuffer.getBackTexture(),
-						 _tex,
-						 _strength);
-		densitySwapBuffer.swap();
+
+		
+		if (_invert)
+		{
+			whiteSwapBuffer.black();
+
+			//addShader.update(*whiteSwapBuffer.getBuffer(),
+			//	whiteSwapBuffer.getBackTexture(),
+			//	_tex,
+			//	_strength);
+			//whiteSwapBuffer.swap();
+
+			mixForceShader.update(*whiteSwapBuffer.getBuffer(),
+				_tex, ofFloatColor(1.0, 0.0));
+				//whiteSwapBuffer.getBackTexture(), ofFloatColor(1.0, 0.0));
+
+			whiteSwapBuffer.swap();
+
+			invertColorShader.update(*whiteSwapBuffer.getBuffer(),
+				//_tex);
+				whiteSwapBuffer.getBackTexture());
+
+			whiteSwapBuffer.swap();
+
+			//addShader.update(*densitySwapBuffer.getBuffer(),
+			//	densitySwapBuffer.getBackTexture(),
+			//	//_tex,
+			//	colorSwapBuffer.getBackTexture(),
+			//	_strength);
+			//densitySwapBuffer.swap();
+
+			addShader.update(*colorSwapBuffer.getBuffer(),
+				colorSwapBuffer.getBackTexture(),
+				//_tex,
+				whiteSwapBuffer.getBackTexture(),
+				_strength);
+			colorSwapBuffer.swap();
+
+		}
+		else
+		{
+			//ofEnableBlendMode(OF_BLENDMODE_DISABLED);
+			addShader.update(*densitySwapBuffer.getBuffer(),
+				densitySwapBuffer.getBackTexture(),
+				_tex,
+				//colorSwapBuffer.getBackTexture(),
+				_strength);
+			densitySwapBuffer.swap();
+		}
+
 		ofPopStyle();
 	};
 	
 	//--------------------------------------------------------------
-	void ftFluidSimulation::addVelocity(ofTexture & _tex, float _strength) {
+	void ftFluidSimulation::addVelocity(ofTexture & _tex, float _strength, bool _invert) {
 		ofPushStyle();
 		ofEnableBlendMode(OF_BLENDMODE_DISABLED);
-		addShader.update(*velocitySwapBuffer.getBuffer(),
-						 velocitySwapBuffer.getBackTexture(),
-						 _tex,
-						 _strength);
-		velocitySwapBuffer.swap();
+		//if (_invert)
+		//{
+		//	colorSwapBuffer.black();
+
+		//	mixForceShader.update(*colorSwapBuffer.getBuffer(), _tex);
+		//	colorSwapBuffer.swap();
+
+		//	invertColorShader.update(*colorSwapBuffer.getBuffer(), colorSwapBuffer.getBackTexture());
+		//	colorSwapBuffer.swap();
+
+		//	addShader.update(*velocitySwapBuffer.getBuffer(),
+		//		velocitySwapBuffer.getBackTexture(),
+		//		//_tex,
+		//		colorSwapBuffer.getBackTexture(),
+		//		_strength);
+		//	velocitySwapBuffer.swap();
+		//}
+		//else
+		{
+			addShader.update(*velocitySwapBuffer.getBuffer(),
+				velocitySwapBuffer.getBackTexture(),
+				_tex,
+				_strength);
+			velocitySwapBuffer.swap();
+		}
 		ofPopStyle();
 	}
 	
 	//--------------------------------------------------------------
-	void ftFluidSimulation::addTemperature(ofTexture & _tex, float _strength){
+	void ftFluidSimulation::addTemperature(ofTexture & _tex, float _strength, bool _invert){
 		ofPushStyle();
 		ofEnableBlendMode(OF_BLENDMODE_DISABLED);
-		addShader.update(*temperatureSwapBuffer.getBuffer(),
-						 temperatureSwapBuffer.getBackTexture(),
-						 _tex,
-						 _strength);
-		temperatureSwapBuffer.swap();
+		//if (_invert)
+		//{
+		//	colorSwapBuffer.black();
+
+		//	mixForceShader.update(*colorSwapBuffer.getBuffer(), _tex);
+		//	colorSwapBuffer.swap();
+
+		//	invertColorShader.update(*colorSwapBuffer.getBuffer(), colorSwapBuffer.getBackTexture());
+		//	colorSwapBuffer.swap();
+
+		//	addShader.update(*temperatureSwapBuffer.getBuffer(),
+		//		temperatureSwapBuffer.getBackTexture(),
+		//		//_tex,
+		//		colorSwapBuffer.getTexture(),
+		//		_strength);
+		//	temperatureSwapBuffer.swap();
+		//}
+		//else
+		{
+			addShader.update(*temperatureSwapBuffer.getBuffer(),
+				temperatureSwapBuffer.getBackTexture(),
+				_tex,
+				_strength);
+			temperatureSwapBuffer.swap();
+		}
 		ofPopStyle();
 	}
 	
 	//--------------------------------------------------------------
-	void ftFluidSimulation::addPressure(ofTexture& _tex, float _strength){
+	void ftFluidSimulation::addPressure(ofTexture& _tex, float _strength, bool _invert){
 		ofPushStyle();
 		ofEnableBlendMode(OF_BLENDMODE_DISABLED);
-		addPressureBuffer.black();
-		
-		addShader.update(addPressureBuffer,
-						 addPressureBuffer.getTexture(), // dubious
-						 _tex,
-						 _strength);
-		
-		addPressureBufferDidChange = true;
+		//if (_invert)
+		//{
+		//	colorSwapBuffer.black();
+
+		//	mixForceShader.update(*colorSwapBuffer.getBuffer(), _tex);
+		//	colorSwapBuffer.swap();
+
+		//	invertColorShader.update(*colorSwapBuffer.getBuffer(), colorSwapBuffer.getBackTexture());
+		//	colorSwapBuffer.swap();
+
+		//	addPressureBuffer.black();
+
+		//	addShader.update(addPressureBuffer,
+		//		addPressureBuffer.getTexture(), // dubious
+		//		//_tex,
+		//		colorSwapBuffer.getBackTexture(),
+		//		_strength);
+
+		//	addPressureBufferDidChange = true;
+		//}
+		//else
+		{
+			addPressureBuffer.black();
+
+			addShader.update(addPressureBuffer,
+				addPressureBuffer.getTexture(), // dubious
+				_tex,
+				_strength);
+
+			addPressureBufferDidChange = true;
+		}
 		ofPopStyle();
 	}
 	
@@ -375,12 +557,18 @@ namespace flowTools {
 	
 	//--------------------------------------------------------------
 	void ftFluidSimulation::draw(int x, int y, float _width, float _height){
-		densitySwapBuffer.getBackTexture().draw(x,y,_width,_height); // why BACK texture?
+		//densitySwapBuffer.getBackTexture().draw(x, y, _width, _height);
+		colorSwapBuffer.getBackTexture().draw(x,y,_width,_height); // why BACK texture?
+		//invertColorShader.update(*colorSwapBuffer.getBuffer(), colorSwapBuffer.getBackTexture());
+		//colorSwapBuffer.swap();
+		//colorSwapBuffer.black();
 	}
 	
 	//--------------------------------------------------------------
 	void ftFluidSimulation::reset() {
 		
+		whiteSwapBuffer.black();
+		colorSwapBuffer.black();
 		densitySwapBuffer.black();
 		velocitySwapBuffer.black();
 		temperatureSwapBuffer.black();
@@ -391,6 +579,7 @@ namespace flowTools {
 	//--------------------------------------------------------------
 	void ftFluidSimulation::resetBackground() {
 		obstacleBuffer.black();
+		//obstacleBuffer.white();
 		createEdgeImage(obstacleBuffer);
 		combinedObstacleNeedsToBeCleaned = true;
 	}

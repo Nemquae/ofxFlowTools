@@ -29,6 +29,7 @@ namespace flowTools {
 								   uniform sampler2DRect positionTexture;
 								   uniform sampler2DRect ALMSTexture;
 								   uniform float TwinkleSpeed;
+								   uniform vec4 Color;
 								   
 								   void main(){
 									   
@@ -47,7 +48,7 @@ namespace flowTools {
 									   alpha *= 0.5 + (cos((age + size) * TwinkleSpeed * mass) + 1.0) * 0.5;
 									   alpha = max(alpha, 0.0);
 									   
-									   gl_FrontColor = vec4(vec3(1.0), alpha);
+									   gl_FrontColor = vec4(Color, alpha);
 									   
 								   }
 								   );
@@ -65,6 +66,7 @@ namespace flowTools {
 								   uniform	mat4 textureMatrix;
 								   uniform	sampler2DRect PositionTexture;
 								   uniform	sampler2DRect ALMSTexture;
+								   uniform	vec3 Color;
 								   
 								   in vec4	position;
 								   in vec2	texcoord;
@@ -96,7 +98,7 @@ namespace flowTools {
 									   alpha *= 0.5 + (cos((age + size) * TwinkleSpeed * mass) + 1.0) * 0.5;
 									   alpha = max(alpha, 0.0);
 									   
-									   colorVarying = vec4(vec3(1.0), alpha);
+									   colorVarying = vec4(Color, alpha);
 								   }
 								);
 			
@@ -129,11 +131,12 @@ namespace flowTools {
 		
 	public:
 		
-		void update(ofVboMesh &particleVbo, int _numParticles, ofTexture& _positionTexture, ofTexture& _ALMSTexture, float _twinkleSpeed){
+		void update(ofVboMesh &particleVbo, int _numParticles, ofTexture& _positionTexture, ofTexture& _ALMSTexture, float _twinkleSpeed, ofVec3f _color){
 			shader.begin();
 			shader.setUniformTexture("PositionTexture", _positionTexture, 0);
 			shader.setUniformTexture("ALMSTexture", _ALMSTexture, 1);
 			shader.setUniform1f("TwinkleSpeed", _twinkleSpeed);
+			shader.setUniform3f("Color", _color);
 			
 			bool dinges = true;
 			//glEnable(GL_POINT_SMOOTH);

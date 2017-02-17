@@ -78,9 +78,10 @@ namespace flowTools {
 									  
 									  vec2 u = texture(Velocity, st2).rg / Scale;
 									  vec2 coord =  st - TimeStep * InverseCellSize * u;
+									  //vec2 coord = u - st;
 									  
 									  fragColor = Dissipation * texture(Backbuffer, coord) * inverseSolid;
-									  
+									  //fragColor = texture2DRect(Backbuffer, coord) * inverseSolid;
 								  }
 								  
 								  );

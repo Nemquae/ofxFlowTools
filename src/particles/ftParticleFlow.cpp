@@ -49,6 +49,7 @@ namespace flowTools {
 		parameters.add(sizeSpread.set("size spread", .75, 0, 1));
 		parameters.add(twinkleSpeed.set("twinkle speed", 11, 0, 20));
 		parameters.add(gravity.set("gravity", ofVec2f(0, 9.80665), ofVec2f(-10,-10), ofVec2f(10,10)));
+		parameters.add(color.set("color", ofVec3f(1.0, 1.0, 1.0), ofVec3f(0, 0, 0), ofVec3f(1.0, 1.0, 1.0)));
 	}
 	
 	void ftParticleFlow::setup(int _simulationWidth, int _simulationHeight, int _numParticlesX, int _numParticlesY) {
@@ -147,7 +148,7 @@ namespace flowTools {
 		ofPushView();
 		ofTranslate(_x, _y);
 		ofScale(_width / numParticlesX, _height / numParticlesY);
-		drawParticleShader.update(particleMesh, numParticles, particlePositionSwapBuffer.getTexture(), particleAgeLifespanMassSizeSwapBuffer.getTexture(), twinkleSpeed.get());
+		drawParticleShader.update(particleMesh, numParticles, particlePositionSwapBuffer.getTexture(), particleAgeLifespanMassSizeSwapBuffer.getTexture(), twinkleSpeed.get(), color.get());
 		
 		ofPopView();
 	}
