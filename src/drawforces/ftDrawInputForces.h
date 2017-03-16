@@ -7,11 +7,11 @@
 
 namespace flowTools {
 	
-	class ftDrawMouseForces {
+	class ftDrawInputForces {
 		
 	public:
-		ftDrawMouseForces();
-        ~ftDrawMouseForces();
+		ftDrawInputForces();
+        ~ftDrawInputForces();
 	
 		void				setup(int _simulationWidth, int _simulationHeight, int _densityWidth = 0, int _densityHeight = 0) ;
 		void				update(float _deltaTime);
@@ -29,6 +29,7 @@ namespace flowTools {
 		ofParameterGroup	leftButtonParameters;
 		ofParameterGroup	rightButtonParameters;
 		ofParameterGroup	middleButtonParameters;
+		ofParameterGroup	singleTouchParameters;
 		
 	private:
 		ofParameter<bool>	doResetDrawForces;
@@ -46,8 +47,11 @@ namespace flowTools {
 		
 		void				mouseMoved(ofMouseEventArgs & mouse);
 		void				mouseDragged(ofMouseEventArgs & mouse);
+		void				touchDown( ofTouchEventArgs & touch );
+		void				touchMoved( ofTouchEventArgs & touch );
 		
 		ofVec2f				lastNormalizedMouse;
+		ofVec2f				lastNormalizedTouch;
 		
 	};
 }

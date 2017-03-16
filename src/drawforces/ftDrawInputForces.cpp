@@ -6,28 +6,32 @@
 //
 //
 
-#include "ftDrawMouseForces.h"
+#include "ftDrawInputForces.h"
 
 
 namespace flowTools {
 	
-	ftDrawMouseForces::ftDrawMouseForces() {
-		ofAddListener(ofEvents().mouseMoved, this, &ftDrawMouseForces::mouseMoved);
-		ofAddListener(ofEvents().mouseDragged, this, &ftDrawMouseForces::mouseDragged);
+	ftDrawInputForces::ftDrawInputForces() {
+		ofAddListener(ofEvents().mouseMoved, this, &ftDrawInputForces::mouseMoved);
+		ofAddListener(ofEvents().mouseDragged, this, &ftDrawInputForces::mouseDragged);
+		ofAddListener( ofEvents().touchMoved, this, &ftDrawInputForces::touchMoved );
+		ofAddListener( ofEvents().touchDown, this, &ftDrawInputForces::touchDown );
 	}
     
-    ftDrawMouseForces::~ftDrawMouseForces() {
-        ofRemoveListener(ofEvents().mouseMoved, this, &ftDrawMouseForces::mouseMoved);
-        ofRemoveListener(ofEvents().mouseDragged, this, &ftDrawMouseForces::mouseDragged);
+    ftDrawInputForces::~ftDrawInputForces() {
+        ofRemoveListener(ofEvents().mouseMoved, this, &ftDrawInputForces::mouseMoved);
+        ofRemoveListener(ofEvents().mouseDragged, this, &ftDrawInputForces::mouseDragged);
+		ofRemoveListener( ofEvents().touchMoved, this, &ftDrawInputForces::touchMoved );
+		ofRemoveListener( ofEvents().touchDown, this, &ftDrawInputForces::touchDown );
     }
 	
-	void ftDrawMouseForces::setup(int _simulationWidth, int _simulationHeight, int _densityWidth, int _densityHeight) {
+	void ftDrawInputForces::setup(int _simulationWidth, int _simulationHeight, int _densityWidth, int _densityHeight) {
 		simulationWidth = _simulationWidth;
 		simulationHeight = _simulationHeight;
 		densityWidth = (!_densityWidth)? simulationWidth : _densityWidth;
 		densityHeight = (!_densityHeight)? simulationHeight: _densityHeight;
 		
-		numDrawForces = 9;
+		numDrawForces = 12;
 		drawForces = new ftDrawForce[numDrawForces];
 		drawForces[0].setup(densityWidth, densityHeight, FT_DENSITY, true);
 		drawForces[0].setName("draw full res");
@@ -47,6 +51,12 @@ namespace flowTools {
 		drawForces[7].setName("draw flow res 1");
 		drawForces[8].setup(simulationWidth, simulationHeight, FT_TEMPERATURE, true);
 		drawForces[8].setName("draw flow res 2");
+		drawForces[ 9 ].setup( densityWidth, densityHeight, FT_DENSITY, true );
+		drawForces[ 9 ].setName( "draw full res" );
+		drawForces[ 10 ].setup( simulationWidth, simulationHeight, FT_VELOCITY, true );
+		drawForces[ 10 ].setName( "draw flow res 1" );
+		drawForces[ 11 ].setup( simulationWidth, simulationHeight, FT_TEMPERATURE, true );
+		drawForces[ 11 ].setName( "draw flow res 2" );
 		
 		leftButtonParameters.setName("mouse left button");
 		leftButtonParameters.add(doResetDrawForces.set("reset", false));
@@ -54,15 +64,18 @@ namespace flowTools {
 		rightButtonParameters.add(doResetDrawForces.set("reset", false));
 		middleButtonParameters.setName("mouse middle button");
 		middleButtonParameters.add(doResetDrawForces.set("reset", false));
-		doResetDrawForces.addListener(this, &ftDrawMouseForces::resetDrawForcesListner);
+		singleTouchParameters.setName( "single touch" );
+		singleTouchParameters.add( doResetDrawForces.set( "reset", false ) );
+		doResetDrawForces.addListener(this, &ftDrawInputForces::resetDrawForcesListner);
 		for (int i=0; i<3; i++) {
 			leftButtonParameters.add(drawForces[i].parameters);
 			rightButtonParameters.add(drawForces[i+3].parameters);
 			middleButtonParameters.add(drawForces[i+6].parameters);
+			singleTouchParameters.add( drawForces[ i + 9 ].parameters );
 		}
 	}
 	
-	void ftDrawMouseForces::update(float _deltaTime) {
+	void ftDrawInputForces::update(float _deltaTime) {
 		deltaTime = _deltaTime;
 		
 		for (int i=0; i<numDrawForces; i++) {
@@ -70,7 +83,7 @@ namespace flowTools {
 		}
 	}
 
-	void ftDrawMouseForces::invertForce(int _index) { 
+	void ftDrawInputForces::invertForce(int _index) { 
 		ofVec4f force = drawForces[_index].getForce();
 		force.x = 1.0 - force.x;
 		force.y = 1.0 - force.y;
@@ -80,9 +93,9 @@ namespace flowTools {
 	}
 	
 	//--------------------------------------------------------------
-	bool ftDrawMouseForces::didChange(int _index) {
+	bool ftDrawInputForces::didChange(int _index) {
 		if (_index < 0 || _index >= numDrawForces) {
-			ofLogWarning("ftDrawMouseForces::getDrawForceType: index out of range");
+			ofLogWarning("ftDrawInputForces::getDrawForceType: index out of range");
 			return false;
 		}
 		else
@@ -90,9 +103,9 @@ namespace flowTools {
 	}
 	
 	//--------------------------------------------------------------
-	ftDrawForceType ftDrawMouseForces::getType(int _index) {
+	ftDrawForceType ftDrawInputForces::getType(int _index) {
 		if (_index < 0 || _index >= numDrawForces) {
-			ofLogWarning("ftDrawMouseForces::getDrawForceType: index out of range");
+			ofLogWarning("ftDrawInputForces::getDrawForceType: index out of range");
 			return FT_NONE;
 		}
 		else
@@ -100,9 +113,9 @@ namespace flowTools {
 	}
 	
 	//--------------------------------------------------------------
-	ofTexture& ftDrawMouseForces::getTextureReference(int _index) {
+	ofTexture& ftDrawInputForces::getTextureReference(int _index) {
 		if (_index < 0 || _index >= numDrawForces) {
-			ofLogError("ftDrawMouseForces::getTexture: index out of range");
+			ofLogError("ftDrawInputForces::getTexture: index out of range");
 		}
 		else
 			return drawForces[_index].getTexture();
@@ -110,9 +123,9 @@ namespace flowTools {
 	}
 	
 	//--------------------------------------------------------------
-	float ftDrawMouseForces::getStrength(int _index) {
+	float ftDrawInputForces::getStrength(int _index) {
 		if (_index < 0 || _index >= numDrawForces) {
-			ofLogWarning("ftDrawMouseForces::getStrength: index out of range");
+			ofLogWarning("ftDrawInputForces::getStrength: index out of range");
 			return 0;
 		}
 		else {
@@ -126,7 +139,7 @@ namespace flowTools {
 	}
 	
 	//--------------------------------------------------------------
-	void ftDrawMouseForces::mouseDragged( ofMouseEventArgs& mouse ) {
+	void ftDrawInputForces::mouseDragged( ofMouseEventArgs& mouse ) {
 		ofVec2f normalizedMouse;
 		
 		normalizedMouse.set(mouse.x / (float)ofGetWindowWidth(), mouse.y / (float)ofGetWindowHeight());
@@ -163,11 +176,57 @@ namespace flowTools {
 		
 	}
 	
-	//--------------------------------------------------------------
-	void ftDrawMouseForces::mouseMoved( ofMouseEventArgs& mouse ){
+	//---------------------------------------------------------------------------------------------
+	void ftDrawInputForces::mouseMoved( ofMouseEventArgs& mouse ){
 		ofVec2f normalizedMouse;
-		normalizedMouse.set(mouse.x / (float)ofGetWindowWidth(), mouse.y / (float)ofGetWindowHeight());
+
+		normalizedMouse.set ( mouse.x / (float)ofGetWindowWidth()
+							, mouse.y / (float)ofGetWindowHeight()
+							);
+
 		lastNormalizedMouse.set(normalizedMouse);
+	}
+
+	//---------------------------------------------------------------------------------------------
+	void ftDrawInputForces::touchDown( ofTouchEventArgs& touch)
+	{
+		ofVec2f normalizedTouch;
+		normalizedTouch.set  ( touch.x / (float)ofGetWindowWidth()
+							 , touch.y / (float)ofGetWindowHeight()
+							);
+		lastNormalizedTouch.set( normalizedTouch );
+	}
+
+	//---------------------------------------------------------------------------------------------
+	void ftDrawInputForces::touchMoved( ofTouchEventArgs& touch)
+	{
+		ofVec2f normalizedTouch;
+		normalizedTouch.set( touch.x / (float)ofGetWindowWidth()
+							 , touch.y / (float)ofGetWindowHeight()
+		);
+
+		ofVec2f normalizedTouchSpeed;
+		normalizedTouchSpeed.set( touch.xspeed / (float)ofGetWindowWidth()
+							 , touch.yspeed / (float)ofGetWindowHeight()
+		);
+
+		ofVec2f normalizedTouchAccel;
+		normalizedTouchAccel.set( touch.xaccel / (float)ofGetWindowWidth()
+							 , touch.yaccel / (float)ofGetWindowHeight()
+		);
+
+		ofVec2f velocity = normalizedTouch - lastNormalizedTouch;
+		//ofVec2f velocity = normalizedTouchSpeed;
+		ofVec2f acceleration = normalizedTouchAccel;
+
+		for( int i = 0; i<3; i++ )
+		{
+			if( drawForces[ i ].getType() == FT_VELOCITY )
+				drawForces[ i ].setForce( velocity );
+			drawForces[ i ].applyForce( normalizedTouch );
+		}
+
+		lastNormalizedTouch.set( normalizedTouch );
 	}
 	
 }

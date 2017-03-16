@@ -36,7 +36,7 @@
 #include "ftVelocityMask.h"
 #include "ftParticleFlow.h"
 #include "ftDrawForce.h"
-#include "ftDrawMouseForces.h"
+#include "ftDrawInputForces.h"
 
 #include "ftDisplayScalar.h"
 #include "ftVelocityField.h"
