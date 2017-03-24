@@ -166,7 +166,7 @@ namespace flowTools {
 		}
 		else if (mouse.button == 1)
 		{
-			for (int i = 6; i<numDrawForces; i++) {
+			for (int i = 6; i<9; i++) {
 				if (drawForces[i].getType() == FT_VELOCITY)
 					drawForces[i].setForce(velocity);
 				drawForces[i].applyForce(normalizedMouse);
