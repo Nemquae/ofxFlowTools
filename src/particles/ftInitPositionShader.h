@@ -9,18 +9,22 @@ namespace flowTools {
 	
 	class ftInitPositionShader : public ftShader {
 	public:
-		ftInitPositionShader() {
+		ftInitPositionShader() {}
+
+		void setup() {
+			ftShader::setup();
+
 			bInitialized = 1;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			if (bInitialized)
-				ofLogNotice("ftInitPositionShader initialized");
+
+			if( bInitialized )
+				ofLogNotice( "ftInitPositionShader initialized" );
 			else
-				ofLogWarning("ftInitPositionShader failed to initialize");
+				ofLogWarning( "ftInitPositionShader failed to initialize" );
 		}
 		
 	protected:

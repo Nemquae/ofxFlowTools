@@ -58,6 +58,13 @@ namespace flowTools {
 	}
 	
 	void ftParticleFlow::setup(int _simulationWidth, int _simulationHeight, int _numParticlesX, int _numParticlesY) {
+
+		initPositionShader.setup();
+		drawParticleShader.setup();
+		moveParticleShader.setup();
+		ALMSParticleShader.setup();
+		addShader.setup();
+
 		simulationWidth = _simulationWidth;
 		simulationHeight = _simulationHeight;
 		numParticlesX = _numParticlesX;

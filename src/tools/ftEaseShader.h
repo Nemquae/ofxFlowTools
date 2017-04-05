@@ -9,18 +9,22 @@ namespace flowTools {
 	
 	class ftEaseShader : public ftShader {
 	public:
-		ftEaseShader() {
+		ftEaseShader() {}
+
+		void setup() {
+			ftShader::setup();
+
 			bInitialized = 1;
-			
-			if (ofGetGLProgrammableRenderer())
-			glThree();
+
+			if( ofGetGLProgrammableRenderer() )
+				glThree();
 			else
-			glTwo();
-			
-			if (bInitialized)
-			ofLogNotice("ftEaseShader initialized");
+				glTwo();
+
+			if( bInitialized )
+				ofLogNotice( "ftEaseShader initialized" );
 			else
-			ofLogWarning("ftEaseShader failed to initialize");
+				ofLogWarning( "ftEaseShader failed to initialize" );
 		}
 		
 	protected:

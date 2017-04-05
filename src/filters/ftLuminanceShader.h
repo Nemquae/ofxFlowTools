@@ -7,18 +7,22 @@ namespace flowTools {
 	
 	class ftLuminanceShader : public ftShader {
 	public:
-		ftLuminanceShader(){
+		ftLuminanceShader(){}
+
+		void setup() {
+			ftShader::setup();
+
 			bInitialized = 1;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			if (bInitialized)
-				ofLogNotice("ftLuminanceShader initialized");
+
+			if( bInitialized )
+				ofLogNotice( "ftLuminanceShader initialized" );
 			else
-				ofLogWarning("ftLuminanceShader failed to initialize");
+				ofLogWarning( "ftLuminanceShader failed to initialize" );
 		}
 		
 	protected:

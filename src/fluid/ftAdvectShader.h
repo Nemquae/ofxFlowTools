@@ -9,18 +9,22 @@ namespace flowTools {
 	
 	class ftAdvectShader : public ftShader {
 	public:
-		ftAdvectShader() {
+		ftAdvectShader() {}
+
+		void setup(){
+			ftShader::setup();
+
 			bInitialized = 1;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			if (bInitialized)
-				ofLogNotice("ftAdvectShader initialized");
+
+			if( bInitialized )
+				ofLogNotice( "ftAdvectShader initialized" );
 			else
-				ofLogWarning("ftAdvectShader failed to initialize");
+				ofLogWarning( "ftAdvectShader failed to initialize" );
 		}
 		
 	protected:

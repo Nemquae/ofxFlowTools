@@ -8,18 +8,22 @@ namespace flowTools {
 	
 	class ftVelocitySpheresShader : public ftShader {
 	public:
-		ftVelocitySpheresShader() {
+		ftVelocitySpheresShader() {}
+
+		void setup() {
+			ftShader::setup();
+
 			bInitialized = 1;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			if (bInitialized)
-				ofLogNotice("ftVelocitySpheresShader initialized");
+
+			if( bInitialized )
+				ofLogNotice( "ftVelocitySpheresShader initialized" );
 			else
-				ofLogWarning("ftVelocitySpheresShader failed to initialize");
+				ofLogWarning( "ftVelocitySpheresShader failed to initialize" );
 		}
 		
 	protected:

@@ -28,8 +28,11 @@ namespace flowTools
 class ftMixForceShader : public ftShader
 {
 public:
-	ftMixForceShader()
+	ftMixForceShader() {}
+
+	void setup() 
 	{
+		ftShader::setup();
 
 		ofLogVerbose( "init ftMixForceShader" );
 		if( ofIsGLProgrammableRenderer() )

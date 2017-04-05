@@ -8,18 +8,22 @@ namespace flowTools {
 
 	class ftDivergenceShader : public ftShader {
 	public:
-		ftDivergenceShader() {
+		ftDivergenceShader() {}
+
+		void setup() {
+			ftShader::setup();
+
 			bInitialized = 1;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			if (bInitialized)
-				ofLogNotice("ftDivergenceShader initialized");
+
+			if( bInitialized )
+				ofLogNotice( "ftDivergenceShader initialized" );
 			else
-				ofLogWarning("ftDivergenceShader failed to initialize");
+				ofLogWarning( "ftDivergenceShader failed to initialize" );
 		}
 		
 	protected:

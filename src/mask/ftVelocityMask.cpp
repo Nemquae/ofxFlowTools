@@ -35,6 +35,13 @@
 namespace flowTools {
 	
 	void ftVelocityMask::setup(int _width, int _height){
+		VelocityMaskShader.setup();
+		EOGShader.setup();
+		HSLShader.setup();
+		contrastShader.setup();
+		gaussianBlurShader.setup();
+		luminanceShader.setup();
+
 		width = _width;
 		height = _height;
 		

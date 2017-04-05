@@ -9,18 +9,23 @@ namespace flowTools {
 	
 	class ftAddForceShader : public ftShader {
 	public:
-		ftAddForceShader() {
+		ftAddForceShader() {}
+
+		void setup() {
+
+			ftShader::setup();
+
 			bInitialized = 1;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			if (bInitialized)
-				ofLogNotice("ftAddForceShader initialized");
+
+			if( bInitialized )
+				ofLogNotice( "ftAddForceShader initialized" );
 			else
-				ofLogWarning("ftAddForceShader failed to initialize");
+				ofLogWarning( "ftAddForceShader failed to initialize" );
 		}
 		
 	protected:

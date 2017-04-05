@@ -8,18 +8,22 @@ namespace flowTools {
 	
 	class ftHSLShader : public ftShader {
 	public:
-		ftHSLShader(){
+		ftHSLShader(){}
+
+		void setup(){
+			ftShader::setup();
+
 			bInitialized = 1;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			if (bInitialized)
-				ofLogNotice("ftHSLShader initialized");
+
+			if( bInitialized )
+				ofLogNotice( "ftHSLShader initialized" );
 			else
-				ofLogWarning("ftHSLShader failed to initialize");
+				ofLogWarning( "ftHSLShader failed to initialize" );
 		}
 		
 	protected:

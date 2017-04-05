@@ -60,6 +60,11 @@ namespace flowTools {
 	};
 	
 	void	ftOpticalFlow::setup(int _width, int _height){
+
+		opticalFlowShader.setup();
+		timeBlurShader.setup();
+		decayShader.setup();
+
 		width = _width;
 		height = _height;
 				

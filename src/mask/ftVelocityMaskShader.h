@@ -9,19 +9,23 @@ namespace flowTools {
 	
 	class ftVelocityMaskShader : public ftShader {
 	public:
-		ftVelocityMaskShader() {
+		ftVelocityMaskShader() {}
+
+		void setup() {
+			ftShader::setup();
+
 			bInitialized = 1;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			if (bInitialized)
-				ofLogNotice("ftVelocityMaskShader initialized");
+
+			if( bInitialized )
+				ofLogNotice( "ftVelocityMaskShader initialized" );
 			else
-				ofLogWarning("ftVelocityMaskShader failed to initialize");
-			}
+				ofLogWarning( "ftVelocityMaskShader failed to initialize" );
+		}
 		
 	protected:
 		void glTwo() {

@@ -9,18 +9,22 @@ namespace flowTools {
 
 	class ftGaussianBlurShader : public ftShader {
 	public:
-		ftGaussianBlurShader(){
+		ftGaussianBlurShader(){}
+
+		void setup(){
+			ftShader::setup();
+
 			bInitialized = 1;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			if (bInitialized)
-				ofLogNotice("ftGaussianBlurShader initialized");
+
+			if( bInitialized )
+				ofLogNotice( "ftGaussianBlurShader initialized" );
 			else
-				ofLogWarning("ftGaussianBlurShader failed to initialize");
+				ofLogWarning( "ftGaussianBlurShader failed to initialize" );
 		}
 		
 	protected:

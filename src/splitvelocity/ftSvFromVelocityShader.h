@@ -9,18 +9,22 @@ namespace flowTools {
 	
 	class ftSvFromVelocityShader : public ftShader {
 	public:
-		ftSvFromVelocityShader() {
+		ftSvFromVelocityShader() {}
+
+		void setup() {
+			ftShader::setup();
+
 			bInitialized = 1;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			if (bInitialized)
-				ofLogNotice("ftSvShader initialized");
+
+			if( bInitialized )
+				ofLogNotice( "ftSvShader initialized" );
 			else
-				ofLogWarning("ftSvShader failed to initialize");
+				ofLogWarning( "ftSvShader failed to initialize" );
 		}
 		
 	protected:

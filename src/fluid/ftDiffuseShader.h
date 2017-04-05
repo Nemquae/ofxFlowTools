@@ -9,18 +9,22 @@ namespace flowTools {
 	
 	class ftDiffuseShader : public ftShader {
 	public:
-		ftDiffuseShader() {
+		ftDiffuseShader() {}
+
+		void setup() {
+			ftShader::setup();
+
 			bInitialized = 1;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			if (bInitialized)
-				ofLogNotice("ftDiffuseShader initialized");
+
+			if( bInitialized )
+				ofLogNotice( "ftDiffuseShader initialized" );
 			else
-				ofLogWarning("ftDiffuseShader failed to initialize");
+				ofLogWarning( "ftDiffuseShader failed to initialize" );
 		}
 		
 	protected:

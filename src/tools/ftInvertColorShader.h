@@ -28,8 +28,11 @@ namespace flowTools
 class ftInvertColorShader : public ftShader
 {
 public:
-	ftInvertColorShader()
+	ftInvertColorShader() {}
+
+	void setup() 
 	{
+		ftShader::setup();
 
 		ofLogVerbose( "init ftInvertColorShader" );
 		if( ofIsGLProgrammableRenderer() )

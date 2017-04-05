@@ -9,18 +9,22 @@ namespace flowTools {
 	
 	class ftPressureFieldShader : public ftShader {
 	public:
-		ftPressureFieldShader() {
+		ftPressureFieldShader() {}
+
+		void setup() {
+			ftShader::setup();
+
 			bInitialized = 1;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			if (bInitialized)
-				ofLogNotice("ftPressureFieldShader initialized");
+
+			if( bInitialized )
+				ofLogNotice( "ftPressureFieldShader initialized" );
 			else
-				ofLogWarning("ftPressureFieldShader failed to initialize");
+				ofLogWarning( "ftPressureFieldShader failed to initialize" );
 		}
 		
 	protected:

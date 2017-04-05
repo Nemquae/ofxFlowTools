@@ -12,20 +12,27 @@ namespace flowTools {
 	public:
 		
 		ofParameterGroup	parameters;
-		ftTimeBlurShader(){
+		ftTimeBlurShader(){}
+
+		void setup() {
+			ftShader::setup();
+
+			decayShader.setup();
+
 			internalFormat = GL_RGBA;
-			
+
 			bInitialized = 1;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			if (bInitialized)
-				ofLogNotice("ftTimeBlurShader initialized");
+
+			if( bInitialized )
+				ofLogNotice( "ftTimeBlurShader initialized" );
 			else
-				ofLogWarning("ftTimeBlurShader failed to initialize");
+				ofLogWarning( "ftTimeBlurShader failed to initialize" );
+
 		}
 		
 	protected:

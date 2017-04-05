@@ -9,18 +9,22 @@ namespace flowTools {
 	
 	class ftNormalizationShader : public ftShader {
 	public:
-		ftNormalizationShader() {
+		ftNormalizationShader() {}
+
+		void setup() {
+			ftShader::setup();
+
 			bInitialized = 1;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			if (bInitialized)
-				ofLogNotice("ftNormalizationShader initialized");
+
+			if( bInitialized )
+				ofLogNotice( "ftNormalizationShader initialized" );
 			else
-				ofLogWarning("ftNormalizationShader failed to initialize");
+				ofLogWarning( "ftNormalizationShader failed to initialize" );
 		}
 		
 	protected:

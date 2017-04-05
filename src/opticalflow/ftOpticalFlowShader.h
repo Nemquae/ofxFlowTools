@@ -9,18 +9,22 @@ namespace flowTools {
 	
 	class ftOpticalFlowShader : public ftShader {
 	public:
-		ftOpticalFlowShader() {
+		ftOpticalFlowShader() {}
+
+		void setup() {
+			ftShader::setup();
+
 			bInitialized = 1;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			if (bInitialized)
-				ofLogNotice("ftOpticalFlowShader initialized");
+
+			if( bInitialized )
+				ofLogNotice( "ftOpticalFlowShader initialized" );
 			else
-				ofLogWarning("ftOpticalFlowShader failed to initialize");
+				ofLogWarning( "ftOpticalFlowShader failed to initialize" );
 		}
 		
 	protected:

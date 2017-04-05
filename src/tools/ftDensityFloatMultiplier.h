@@ -9,10 +9,14 @@ namespace flowTools {
 	
 	class ftDensityFloatMultiplier : public ftShader {
 	public:
-		ftDensityFloatMultiplier() {
-			
-			ofLogVerbose("init ftDensityFloatMultiplier");
-			if (ofIsGLProgrammableRenderer())
+		ftDensityFloatMultiplier() {}
+
+		void setup() {
+
+			ftShader::setup();
+
+			ofLogVerbose( "init ftDensityFloatMultiplier" );
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();

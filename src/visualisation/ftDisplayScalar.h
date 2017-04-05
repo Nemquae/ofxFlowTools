@@ -10,6 +10,7 @@ namespace flowTools {
 	public:
 		
 		void	setup(int _width, int _height){
+			displayScalarShader.setup();
 			width = _width;
 			height = _height;
 			displayScalarBuffer.allocate(width, height);

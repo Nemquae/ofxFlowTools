@@ -8,18 +8,22 @@ namespace flowTools {
 	
 	class ftDecayShader : public ftShader {
 	public:
-		ftDecayShader(){
+		ftDecayShader(){}
+
+		void setup() {
+			ftShader::setup();
+
 			bInitialized = 1;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			if (bInitialized)
-				ofLogNotice("ftDecayShader initialized");
+
+			if( bInitialized )
+				ofLogNotice( "ftDecayShader initialized" );
 			else
-				ofLogWarning("ftDecayShader failed to initialize");
+				ofLogWarning( "ftDecayShader failed to initialize" );
 		}
 		
 	protected:

@@ -47,6 +47,9 @@ namespace flowTools {
 	}
 		
 	void ftDrawForce::setup(int _width, int _height, ftDrawForceType _type, bool _isTemporary) {
+
+		drawForceShader.setup();
+
 		width = _width;
 		height = _height;
 		type = _type;

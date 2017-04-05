@@ -8,18 +8,22 @@ namespace flowTools {
 	
 	class ftSubstractGradient : public ftShader {
 	public:
-		ftSubstractGradient() {
+		ftSubstractGradient() {}
+
+		void setup() {
+			ftShader::setup();
+
 			bInitialized = 1;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			if (bInitialized)
-				ofLogNotice("ftSubstractGradient initialized");
+
+			if( bInitialized )
+				ofLogNotice( "ftSubstractGradient initialized" );
 			else
-				ofLogWarning("ftSubstractGradient failed to initialize");
+				ofLogWarning( "ftSubstractGradient failed to initialize" );
 		}
 		
 	protected:

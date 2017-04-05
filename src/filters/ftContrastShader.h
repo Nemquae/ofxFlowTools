@@ -7,18 +7,23 @@ namespace flowTools {
 
 	class ftContrastShader : public ftShader {
 	public:
-		ftContrastShader(){
+		ftContrastShader(){}
+
+		void setup()
+		{
+			ftShader::setup();
+
 			bInitialized = 1;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			if (bInitialized)
-				ofLogNotice("ftContrastShader initialized");
+
+			if( bInitialized )
+				ofLogNotice( "ftContrastShader initialized" );
 			else
-				ofLogWarning("ftContrastShader failed to initialize");
+				ofLogWarning( "ftContrastShader failed to initialize" );
 		}
 		
 	protected:

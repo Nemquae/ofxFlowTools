@@ -9,18 +9,22 @@ namespace flowTools {
 	
 	class ftDisplayScalarShader : public ftShader {
 	public:
-		ftDisplayScalarShader() {
+		ftDisplayScalarShader() {}
+
+		void setup() {
+			ftShader::setup();
+
 			bInitialized = 1;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			if (bInitialized)
-				ofLogNotice("ftDisplayScalarShader initialized");
+
+			if( bInitialized )
+				ofLogNotice( "ftDisplayScalarShader initialized" );
 			else
-				ofLogWarning("ftDisplayScalarShader failed to initialize");
+				ofLogWarning( "ftDisplayScalarShader failed to initialize" );
 		}
 		
 	protected:

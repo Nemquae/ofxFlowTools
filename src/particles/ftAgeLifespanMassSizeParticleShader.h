@@ -9,18 +9,22 @@ namespace flowTools {
 	
 	class ftAgeLifespanMassSizeParticleShader : public ftShader {
 	public:
-		ftAgeLifespanMassSizeParticleShader() {
+		ftAgeLifespanMassSizeParticleShader() {}
+
+		void setup() {
+			ftShader::setup();
+
 			bInitialized = 1;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			if (bInitialized)
-				ofLogNotice("ftAgeLifespanMassSizeParticleShader initialized");
+
+			if( bInitialized )
+				ofLogNotice( "ftAgeLifespanMassSizeParticleShader initialized" );
 			else
-				ofLogWarning("ftAgeLifespanMassSizeParticleShader failed to initialize");
+				ofLogWarning( "ftAgeLifespanMassSizeParticleShader failed to initialize" );
 		}
 		
 	protected:

@@ -10,6 +10,8 @@ namespace flowTools {
 	public:
 		
 		void	allocate(int _width, int _height){
+			toScalarShader.setup();
+
 			width = _width;
 			height = _height;
 			ScalarBuffer.allocate(width, height, GL_RGB32F);

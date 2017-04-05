@@ -13,18 +13,22 @@ namespace flowTools {
 	
 	class ftVelocityFieldShader : public ftShader {
 	public:
-		ftVelocityFieldShader() {
+		ftVelocityFieldShader() {}
+
+		void setup() {
+			ftShader::setup();
+
 			bInitialized = 1;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			if (bInitialized)
-				ofLogNotice("ftVelocityFieldShader initialized");
+
+			if( bInitialized )
+				ofLogNotice( "ftVelocityFieldShader initialized" );
 			else
-				ofLogWarning("ftVelocityFieldShader failed to initialize");
+				ofLogWarning( "ftVelocityFieldShader failed to initialize" );
 		}
 		
 	protected:

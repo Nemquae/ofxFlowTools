@@ -7,18 +7,22 @@ namespace flowTools {
 		
 	class ftVorticitySecondPassShader : public ftShader {
 	public:
-		ftVorticitySecondPassShader() {
+		ftVorticitySecondPassShader() {}
+
+		void setup() {
+			ftShader::setup();
+
 			bInitialized = 1;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			if (bInitialized)
-				ofLogNotice("ftVorticitySecondPassShader initialized");
+
+			if( bInitialized )
+				ofLogNotice( "ftVorticitySecondPassShader initialized" );
 			else
-				ofLogWarning("ftVorticitySecondPassShader failed to initialize");
+				ofLogWarning( "ftVorticitySecondPassShader failed to initialize" );
 		}
 		
 	protected:

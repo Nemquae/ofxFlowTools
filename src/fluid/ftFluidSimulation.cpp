@@ -78,6 +78,22 @@ namespace flowTools {
 	
 	//--------------------------------------------------------------
 	void ftFluidSimulation::setup(int _simulationWidth, int _simulationHeight, int _densityWidth, int _densityHeight) {
+
+		mixForceShader.setup();
+		invertColorShader.setup();
+		diffuseShader.setup();
+		advectShader.setup();
+		divergenceShader.setup();
+		jacobiShader.setup();
+		substractGradientShader.setup();
+		smokeBuoyancyShader.setup();
+		vorticityFirstPassShader.setup();
+		vorticitySecondPassShader.setup();
+		addShader.setup();
+		clampLengthShader.setup();
+		densityFloatMultiplierShader.setup();
+		densityVec2MultiplierShader.setup();
+
 		simulationWidth = _simulationWidth;
 		simulationHeight = _simulationHeight;
 		densityWidth = (!_densityWidth)? simulationWidth : _densityWidth;

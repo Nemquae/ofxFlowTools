@@ -12,17 +12,19 @@ namespace flowTools {
 	
 	class ftShader{
 	public:
-		ftShader() {
+		ftShader() {}
+
+		void setup() {
 			bInitialized = false;
-			
-			if (ofIsGLProgrammableRenderer())
+
+			if( ofIsGLProgrammableRenderer() )
 				glThree();
 			else
 				glTwo();
-			
-			quad.getVertices().resize(4);
-			quad.getTexCoords().resize(4);
-			quad.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
+
+			quad.getVertices().resize( 4 );
+			quad.getTexCoords().resize( 4 );
+			quad.setMode( OF_PRIMITIVE_TRIANGLE_FAN );
 		}
 		
 	protected:
