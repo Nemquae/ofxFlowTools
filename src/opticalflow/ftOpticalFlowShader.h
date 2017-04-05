@@ -16,10 +16,19 @@ namespace flowTools {
 
 			bInitialized = 1;
 
-			if( ofIsGLProgrammableRenderer() )
-				glThree();
-			else
-				glTwo();
+            string glslVer = (char *)glGetString(GL_SHADING_LANGUAGE_VERSION);
+            GLint majorVer = 0;
+            GLint minorVer = 0;
+            
+            //glGetIntegerv(GL_MAJOR_VERSION, &majorVer);
+            //glGetIntegerv(GL_MINOR_VERSION, &minorVer);
+            
+            if( glslVer == "OpenGL ES GLSL ES 1.00" )//|| (majorVer == 2 && minorVer == 0))
+                glOne();
+            else if( glslVer == "OpenGL ES GLSL ES 2.00" )//|| (majorVer >= 2 && majorVer < 3))
+                glTwo();
+            else if( ofIsGLProgrammableRenderer() )//|| (ofIsGLProgrammableRenderer() && majorVer >= 3))
+                glThree();
 
 			if( bInitialized )
 				ofLogNotice( "ftOpticalFlowShader initialized" );
