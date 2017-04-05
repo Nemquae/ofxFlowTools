@@ -23,17 +23,12 @@ namespace flowTools {
 			bInitialized = false;
             
             string glslVer = (char *)glGetString(GL_SHADING_LANGUAGE_VERSION);
-            GLint majorVer = 0;
-            GLint minorVer = 0;
-            
-            //glGetIntegerv(GL_MAJOR_VERSION, &majorVer);
-            //glGetIntegerv(GL_MINOR_VERSION, &minorVer);
-
-			if( glslVer == "OpenGL ES GLSL ES 1.00" )//|| (majorVer == 2 && minorVer == 0))
+         
+			if( glslVer == "OpenGL ES GLSL ES 1.00" )
                 glOne();
-            else if( glslVer == "OpenGL ES GLSL ES 2.00" )//|| (majorVer >= 2 && majorVer < 3))
+            else if( glslVer == "OpenGL ES GLSL ES 2.00" )
 				glTwo();
-			else if( ofIsGLProgrammableRenderer() )//|| (ofIsGLProgrammableRenderer() && majorVer >= 3))
+			else if( ofIsGLProgrammableRenderer() )
 				glThree();
 
 			quad.getVertices().resize( 4 );

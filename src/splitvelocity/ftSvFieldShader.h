@@ -15,10 +15,14 @@ namespace flowTools {
 
 			bInitialized = 1;
 
-			if( ofIsGLProgrammableRenderer() )
-				glThree();
-			else
+			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
+
+			if( glslVer == "OpenGL ES GLSL ES 1.00" )
+				glOne();
+			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
 				glTwo();
+			else if( ofIsGLProgrammableRenderer() )
+				glThree();
 
 			if( bInitialized )
 				ofLogNotice( "ftSvFieldShader initialized" );
@@ -27,6 +31,76 @@ namespace flowTools {
 		}
 		
 	protected:
+		void glOne()
+		{
+			string geometryShader;
+
+
+			vertexShader = GLSL100(
+				void main()
+			{
+				gl_Position = gl_Vertex;
+				gl_FrontColor = gl_Color;
+			}
+			);
+
+			fragmentShader = GLSL100(
+				void main()
+			{
+				gl_FragColor = gl_Color;
+			}
+			);
+
+			geometryShader = GLSL100GEO(
+				uniform sampler2DRect fieldTexture;
+			uniform vec2 texResolution;
+			uniform vec4 baseColor;
+			uniform float vectorSize;
+			uniform float maxArrowSize;
+
+			void main()
+			{
+
+				vec4 lineStart = gl_PositionIn[ 0 ];
+				vec2 uv = lineStart.xy * texResolution;
+
+				vec4 splitVelocity = texture2DRect( fieldTexture, uv ) * vectorSize;
+
+				vec2 pVel = splitVelocity.xy;
+				if( length( pVel ) > maxArrowSize )
+					pVel = normalize( pVel ) * maxArrowSize;
+				vec2 nVel = splitVelocity.zw;
+				if( length( nVel ) > maxArrowSize )
+					nVel = normalize( nVel ) * maxArrowSize;
+
+
+				gl_Position = gl_ModelViewProjectionMatrix * ( lineStart + vec4( pVel, 0, 0 ) );
+				gl_FrontColor = vec4( normalize( pVel ), 0, 1 );
+				EmitVertex();
+
+				gl_Position = gl_ModelViewProjectionMatrix * lineStart;
+				gl_FrontColor = vec4( 0, 0, 0, .2 );
+				EmitVertex();
+
+				gl_Position = gl_ModelViewProjectionMatrix * ( lineStart - vec4( nVel, 0, 0 ) );
+				gl_FrontColor = vec4( 0, normalize( nVel ), 1 );
+				EmitVertex();
+
+				EndPrimitive();
+			}
+			);
+
+			ofLogVerbose( "Maximum number of output vertices support is: " + ofToString( shader.getGeometryMaxOutputCount() ) );
+			shader.setGeometryInputType( GL_POINTS );
+			shader.setGeometryOutputType( GL_LINE_STRIP );
+			shader.setGeometryOutputCount( 3 );
+			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
+			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+			bInitialized *= shader.setupShaderFromSource( GL_GEOMETRY_SHADER_EXT, geometryShader );
+			bInitialized *= shader.linkProgram();
+
+		}
+
 		void glTwo() {
 			string geometryShader;
 			

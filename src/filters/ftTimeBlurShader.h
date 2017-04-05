@@ -23,10 +23,14 @@ namespace flowTools {
 
 			bInitialized = 1;
 
-			if( ofIsGLProgrammableRenderer() )
-				glThree();
-			else
+			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
+
+			if( glslVer == "OpenGL ES GLSL ES 1.00" )
+				glOne();
+			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
 				glTwo();
+			else if( ofIsGLProgrammableRenderer() )
+				glThree();
 
 			if( bInitialized )
 				ofLogNotice( "ftTimeBlurShader initialized" );
@@ -36,6 +40,69 @@ namespace flowTools {
 		}
 		
 	protected:
+		void glOne()
+		{
+			string fragmentHorizontalBlurShader = GLSL100(
+				uniform sampler2DRect backbuffer;
+			uniform float radius;
+
+			const float total = ( 1. + 8. + 28. + 56. ) * 2. + 70.;
+
+			void main( void )
+			{
+				vec2 st = gl_TexCoord[ 0 ].st;
+
+				vec4 color = vec4( 0.0, 0.0, 0.0, 0.0 );
+				color += ( 1. / total ) * texture2DRect( backbuffer, st - radius * vec2( 4. / 4., 0. ) );
+				color += ( 8. / total )  * texture2DRect( backbuffer, st - radius * vec2( 3. / 4., 0. ) );
+				color += ( 28. / total )  * texture2DRect( backbuffer, st - radius * vec2( 2. / 4., 0. ) );
+				color += ( 56. / total )  * texture2DRect( backbuffer, st - radius * vec2( 1. / 4., 0. ) );
+
+				color += ( 70. / total ) * texture2DRect( backbuffer, st );
+
+				color += ( 1. / total ) * texture2DRect( backbuffer, st + radius * vec2( 4. / 4., 0. ) );
+				color += ( 8. / total )  * texture2DRect( backbuffer, st + radius * vec2( 3. / 4., 0. ) );
+				color += ( 28. / total )  * texture2DRect( backbuffer, st + radius * vec2( 2. / 4., 0. ) );
+				color += ( 56. / total )  * texture2DRect( backbuffer, st + radius * vec2( 1. / 4., 0. ) );
+
+				gl_FragColor = color;
+			}
+			);
+			blurShader[ 0 ].unload();
+			bInitialized *= blurShader[ 0 ].setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentHorizontalBlurShader );
+			bInitialized *= blurShader[ 0 ].linkProgram();
+
+			string fragmentVerticalBlurShader = GLSL120(
+				uniform sampler2DRect backbuffer;
+			uniform float radius;
+
+			const float total = ( 1. + 8. + 28. + 56. ) * 2. + 70.;
+
+			void main( void )
+			{
+				vec2 st = gl_TexCoord[ 0 ].st;
+
+				vec4 color = vec4( 0.0, 0.0, 0.0, 0.0 );
+				color += ( 1. / total ) * texture2DRect( backbuffer, st - radius * vec2( 0., 4. / 4. ) );
+				color += ( 8. / total )  * texture2DRect( backbuffer, st - radius * vec2( 0., 3. / 4. ) );
+				color += ( 28. / total )  * texture2DRect( backbuffer, st - radius * vec2( 0., 2. / 4. ) );
+				color += ( 56. / total )  * texture2DRect( backbuffer, st - radius * vec2( 0., 1. / 4. ) );
+
+				color += ( 70. / total ) * texture2DRect( backbuffer, st );
+
+				color += ( 1. / total ) * texture2DRect( backbuffer, st + radius * vec2( 0., 4. / 4. ) );
+				color += ( 8. / total )  * texture2DRect( backbuffer, st + radius * vec2( 0., 3. / 4. ) );
+				color += ( 28. / total )  * texture2DRect( backbuffer, st + radius * vec2( 0., 2. / 4. ) );
+				color += ( 56. / total )  * texture2DRect( backbuffer, st + radius * vec2( 0., 1. / 4. ) );
+
+				gl_FragColor = color;
+			}
+			);
+			blurShader[ 1 ].unload();
+			bInitialized *= blurShader[ 1 ].setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentVerticalBlurShader );
+			bInitialized *= blurShader[ 1 ].linkProgram();
+		}
+
 		void glTwo() {
 			string fragmentHorizontalBlurShader = GLSL120(
 													   uniform sampler2DRect backbuffer;

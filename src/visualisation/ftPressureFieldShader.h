@@ -16,10 +16,14 @@ namespace flowTools {
 
 			bInitialized = 1;
 
-			if( ofIsGLProgrammableRenderer() )
-				glThree();
-			else
+			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
+
+			if( glslVer == "OpenGL ES GLSL ES 1.00" )
+				glOne();
+			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
 				glTwo();
+			else if( ofIsGLProgrammableRenderer() )
+				glThree();
 
 			if( bInitialized )
 				ofLogNotice( "ftPressureFieldShader initialized" );
@@ -28,6 +32,88 @@ namespace flowTools {
 		}
 		
 	protected:
+		void glOne()
+		{
+			string geometryShader;
+
+			vertexShader = GLSL100(
+				void main()
+			{
+				gl_Position = gl_Vertex;
+				gl_FrontColor = gl_Color;
+			}
+			);
+
+			fragmentShader = GLSL100(
+				void main()
+			{
+				gl_FragColor = gl_Color;
+			}
+			);
+
+			geometryShader = GLSL100GEO(
+				uniform sampler2DRect pressureTexture;
+			uniform vec2 texResolution;
+			uniform float pressureScale;
+			uniform float maxRadius;
+
+			void main()
+			{
+				vec4 centre = gl_PositionIn[ 0 ];
+				vec2 uv = centre.xy * texResolution;
+
+				float pressure = texture2DRect( pressureTexture, uv ).x * pressureScale;
+				pressure = min( pressure, maxRadius );
+				pressure = max( pressure, -maxRadius );
+				float aspectRatio = texResolution.x / texResolution.y;
+
+				vec4 north = centre + vec4( pressure, 0, 0, 0 );
+				vec4 east = centre + vec4( 0, pressure * aspectRatio, 0, 0 );
+				vec4 south = centre + vec4( -pressure, 0, 0, 0 );
+				vec4 west = centre + vec4( 0, -pressure * aspectRatio, 0, 0 );
+
+				float normalizedPressure = pressure / maxRadius;
+				float highPressure = pow( max( 0.0, normalizedPressure ), 0.5 );
+				float lowPressure = pow( max( 0.0, -normalizedPressure ), 0.5 );
+				float red = 1.0 - lowPressure;
+				float green = 1.0;
+				float blue = 1.0 - highPressure;
+				float alpha = 0.3 + 0.3 * ( abs( normalizedPressure ) );
+
+				vec4 color = vec4( red, green, blue, alpha );
+
+				gl_Position = gl_ModelViewProjectionMatrix * north;
+				gl_FrontColor = color;
+				EmitVertex();
+
+				gl_Position = gl_ModelViewProjectionMatrix * east;
+				gl_FrontColor = color;
+				EmitVertex();
+
+				gl_Position = gl_ModelViewProjectionMatrix * south;
+				gl_FrontColor = color;
+				EmitVertex();
+
+				gl_Position = gl_ModelViewProjectionMatrix * west;
+				gl_FrontColor = color;
+				EmitVertex();
+
+				gl_Position = gl_ModelViewProjectionMatrix * north;
+				gl_FrontColor = color;
+				EmitVertex();
+			}
+			);
+
+			ofLogVerbose( "Maximum number of output vertices support is: " + ofToString( shader.getGeometryMaxOutputCount() ) );
+			shader.setGeometryInputType( GL_POINTS );
+			shader.setGeometryOutputType( GL_LINE_STRIP );
+			shader.setGeometryOutputCount( 5 );
+			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
+			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+			bInitialized *= shader.setupShaderFromSource( GL_GEOMETRY_SHADER_EXT, geometryShader );
+			bInitialized *= shader.linkProgram();
+		}
+
 		void glTwo() {
 			string geometryShader;
 			

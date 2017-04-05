@@ -15,10 +15,14 @@ namespace flowTools {
 
 			bInitialized = 1;
 
-			if( ofIsGLProgrammableRenderer() )
-				glThree();
-			else
+			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
+
+			if( glslVer == "OpenGL ES GLSL ES 1.00" )
+				glOne();
+			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
 				glTwo();
+			else if( ofIsGLProgrammableRenderer() )
+				glThree();
 
 			if( bInitialized )
 				ofLogNotice( "ftDecayShader initialized" );
@@ -27,6 +31,28 @@ namespace flowTools {
 		}
 		
 	protected:
+		void glOne()
+		{
+			fragmentShader = GLSL100(
+				uniform sampler2DRect tex0;
+			uniform sampler2DRect tex1;
+			uniform float decay;
+
+			void main()
+			{
+				vec4 color0 = texture2DRect( tex0, gl_TexCoord[ 0 ].st );
+				vec4 color1 = texture2DRect( tex1, gl_TexCoord[ 0 ].st );
+				color0 *= vec4( 1.0 - decay );
+
+				gl_FragColor = color0 + color1;
+			}
+			);
+
+			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+			bInitialized *= shader.linkProgram();
+
+		}
+
 		void glTwo() {
 			fragmentShader = GLSL120(
 									 uniform sampler2DRect tex0;

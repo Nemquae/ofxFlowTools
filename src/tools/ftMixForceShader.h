@@ -35,13 +35,40 @@ public:
 		ftShader::setup();
 
 		ofLogVerbose( "init ftMixForceShader" );
-		if( ofIsGLProgrammableRenderer() )
-			glThree();
-		else
+		string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
+
+		if( glslVer == "OpenGL ES GLSL ES 1.00" )
+			glOne();
+		else if( glslVer == "OpenGL ES GLSL ES 2.00" )
 			glTwo();
+		else if( ofIsGLProgrammableRenderer() )
+			glThree();
 	}
 
 protected:
+	void glOne()
+	{
+		fragmentShader = GLSL100(
+
+			uniform sampler2DRect Backbuffer;
+
+		void main()
+		{
+			vec2 st = gl_TexCoord[ 0 ].st;
+
+			vec4 color = texture2DRect( Backbuffer, st );
+
+			color = mix( color, vec4( 1.0, 1.0, 1.0, 1.0 ), 1.0 - color.w );
+
+			gl_FragColor = color;
+		}
+		);
+
+		shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+		shader.linkProgram();
+
+	}
+
 	void glTwo()
 	{
 		fragmentShader = GLSL120(

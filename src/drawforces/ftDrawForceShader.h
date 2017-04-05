@@ -16,10 +16,14 @@ namespace flowTools {
 
 			bInitialized = 1;
 
-			if( ofIsGLProgrammableRenderer() )
-				glThree();
-			else
+			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
+
+			if( glslVer == "OpenGL ES GLSL ES 1.00" )
+				glOne();
+			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
 				glTwo();
+			else if( ofIsGLProgrammableRenderer() )
+				glThree();
 
 			if( bInitialized )
 				ofLogNotice( "ftDrawForceShader initialized" );
@@ -28,6 +32,33 @@ namespace flowTools {
 		}
 		
 	protected:
+		void glOne()
+		{
+			fragmentShader = GLSL100(
+				uniform vec2		Point;
+			uniform float	Radius;
+			uniform float	EdgeSmooth;
+			uniform vec4		Value;
+
+			void main()
+			{
+				vec4 color = Value;
+				float d = distance( Point, gl_TexCoord[ 0 ].st );
+				float a = max( ( Radius - d ) / Radius, 0.0 );
+				float c = ceil( a );
+				color.xyz *= c;//= mix(color.xyz, vec3(1, 1, 1), 1.0 - c);
+				color.w *= pow( a, EdgeSmooth + 0.1 );
+				gl_FragColor = color;
+
+			}
+			);
+
+			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+			bInitialized *= shader.linkProgram();
+
+
+		}
+
 		void glTwo() {
 			fragmentShader = GLSL120(
 								  uniform vec2		Point;

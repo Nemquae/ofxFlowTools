@@ -20,10 +20,14 @@ namespace flowTools {
 
 			bInitialized = 1;
 
-			if( ofIsGLProgrammableRenderer() )
-				glThree();
-			else
+			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
+
+			if( glslVer == "OpenGL ES GLSL ES 1.00" )
+				glOne();
+			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
 				glTwo();
+			else if( ofIsGLProgrammableRenderer() )
+				glThree();
 
 			if( bInitialized )
 				ofLogNotice( "ftDrawParticleShader initialized" );
@@ -32,6 +36,44 @@ namespace flowTools {
 		}
 		
 	protected:
+		void glOne()
+		{
+			vertexShader = GLSL100(
+				uniform sampler2DRect positionTexture;
+			uniform sampler2DRect ALMSTexture;
+			uniform float TwinkleSpeed;
+			uniform vec4 Color;
+
+			void main()
+			{
+
+				vec2 st = gl_Vertex.xy;
+
+				vec2 texPos = texture2DRect( positionTexture, st ).xy;
+				gl_Position = gl_ModelViewProjectionMatrix * vec4( texPos, 0.0, 1.0 );
+				vec4 alms = texture2DRect( ALMSTexture, st );
+				float age = alms.x;
+				float life = alms.y;
+				float mass = alms.z;
+				float size = alms.w;
+				gl_PointSize = size;
+
+				float alpha = min( 0.5 - ( age / life ) * 0.5, age * 5. );
+				alpha *= 0.5 + ( cos( ( age + size ) * TwinkleSpeed * mass ) + 1.0 ) * 0.5;
+				alpha = max( alpha, 0.0 );
+
+				gl_FrontColor = vec4( Color, alpha );
+
+			}
+			);
+
+
+			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
+			bInitialized *= shader.linkProgram();
+
+
+		}
+
 		void glTwo() {
 			vertexShader = GLSL120(
 								   uniform sampler2DRect positionTexture;

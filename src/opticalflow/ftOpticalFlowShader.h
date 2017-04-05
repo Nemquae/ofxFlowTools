@@ -37,6 +37,73 @@ namespace flowTools {
 		}
 		
 	protected:
+		void glOne()
+		{
+			fragmentShader = GLSL100(
+				uniform sampler2DRect	CurrTexture;
+			uniform sampler2DRect	LastTexture;
+			uniform float			force;
+			uniform float			offset;
+			uniform float			lambda;
+			uniform float			threshold;
+			uniform float			inverseX;
+			uniform float			inverseY;
+			uniform float			FlowPower;
+
+			void main()
+			{
+				vec2 st = gl_TexCoord[ 0 ].st;
+
+				vec2	off_x = vec2( offset, 0.0 );
+				vec2	off_y = vec2( 0.0, offset );
+
+				//get the difference
+				vec4 scr_dif = texture2DRect( CurrTexture, st ) - texture2DRect( LastTexture, st );
+
+				//calculate the gradient
+				vec4 gradx; vec4 grady; vec4 gradmag; vec4 vx; vec4 vy;
+				gradx = texture2DRect( LastTexture, st + off_x ) - texture2DRect( LastTexture, st - off_x );
+				gradx += texture2DRect( CurrTexture, st + off_x ) - texture2DRect( CurrTexture, st - off_x );
+				grady = texture2DRect( LastTexture, st + off_y ) - texture2DRect( LastTexture, st - off_y );
+				grady += texture2DRect( CurrTexture, st + off_y ) - texture2DRect( CurrTexture, st - off_y );
+
+				gradmag = sqrt( ( gradx*gradx ) + ( grady*grady ) + vec4( lambda ) );
+				vx = scr_dif*( gradx / gradmag );
+				vy = scr_dif*( grady / gradmag );
+
+				vec2	flow = vec2( 0.0 );
+				flow.x = -( vx.x + vx.y + vx.z ) / 3.0 * inverseX;
+				flow.y = -( vy.x + vy.y + vy.z ) / 3.0 * inverseY;
+
+				// apply treshold
+				float strength = length( flow );
+				if( strength * threshold > 0.0 )
+				{
+					if( strength < threshold )
+					{
+						flow = vec2( 0.0 );
+					}
+					else
+					{
+						strength = ( strength - threshold ) / ( 1.0 - threshold );
+						flow = normalize( flow ) * vec2( strength );
+
+					}
+				}
+
+				// apply force
+				flow *= vec2( force );
+
+				// set color
+				gl_FragColor = vec4( flow, 0.0, 1.0 );
+			}
+			);
+
+			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+			bInitialized *= shader.linkProgram();
+
+		}
+
 		void glTwo() {
 			fragmentShader = GLSL120(
 								  uniform sampler2DRect	CurrTexture;

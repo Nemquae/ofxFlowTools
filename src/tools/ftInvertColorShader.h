@@ -35,13 +35,54 @@ public:
 		ftShader::setup();
 
 		ofLogVerbose( "init ftInvertColorShader" );
-		if( ofIsGLProgrammableRenderer() )
-			glThree();
-		else
+		string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
+
+		if( glslVer == "OpenGL ES GLSL ES 1.00" )
+			glOne();
+		else if( glslVer == "OpenGL ES GLSL ES 2.00" )
 			glTwo();
+		else if( ofIsGLProgrammableRenderer() )
+			glThree();
 	}
 
 protected:
+	void glOne()
+	{
+		fragmentShader = GLSL100(
+
+			uniform sampler2DRect Backbuffer;
+
+		void main()
+		{
+			vec2 st = gl_TexCoord[ 0 ].st;
+
+			vec4 color = texture2DRect( Backbuffer, st );
+
+			//if (color.w > 0.1)
+			//{
+			color.x = 1.0 - color.x;
+			color.y = 1.0 - color.y;
+			color.z = 1.0 - color.z;
+			//}
+			//else
+			//{
+			//	color.x = 0.0;
+			//	color.y = 0.0;
+			//	color.z = 0.0;
+			//}
+
+			//color = normalize(color);
+
+
+			gl_FragColor = color;
+		}
+		);
+
+		shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+		shader.linkProgram();
+
+	}
+
 	void glTwo()
 	{
 		fragmentShader = GLSL120(

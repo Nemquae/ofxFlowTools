@@ -15,10 +15,14 @@ namespace flowTools {
 
 			bInitialized = 1;
 
-			if( ofIsGLProgrammableRenderer() )
-				glThree();
-			else
+			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
+
+			if( glslVer == "OpenGL ES GLSL ES 1.00" )
+				glOne();
+			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
 				glTwo();
+			else if( ofIsGLProgrammableRenderer() )
+				glThree();
 
 			if( bInitialized )
 				ofLogNotice( "ftContrastShader initialized" );
@@ -27,6 +31,32 @@ namespace flowTools {
 		}
 		
 	protected:
+
+		void glOne()
+		{
+			fragmentShader = GLSL100(
+				uniform sampler2DRect tex0;
+			uniform float contrast;
+			uniform float brightness;
+
+			void main()
+			{
+				vec4 color = texture2DRect( tex0, gl_TexCoord[ 0 ].st );
+				float alpha = color.a;
+				float p = 0.3 *color.g + 0.59*color.r + 0.11*color.b;
+				p = p * brightness;
+				color = vec4( p, p, p, 1.0 );
+				color = mix( vec4( 1.0, 1.0, 1.0, 1.0 ), color, contrast );
+
+				gl_FragColor = vec4( color.r, color.g, color.b, alpha );
+			}
+			);
+
+			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+			bInitialized *= shader.linkProgram();
+
+		}
+
 		void glTwo() {
 			fragmentShader = GLSL120(
 									 uniform sampler2DRect tex0;

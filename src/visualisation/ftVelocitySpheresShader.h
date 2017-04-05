@@ -15,10 +15,14 @@ namespace flowTools {
 
 			bInitialized = 1;
 
-			if( ofIsGLProgrammableRenderer() )
-				glThree();
-			else
+			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
+
+			if( glslVer == "OpenGL ES GLSL ES 1.00" )
+				glOne();
+			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
 				glTwo();
+			else if( ofIsGLProgrammableRenderer() )
+				glThree();
 
 			if( bInitialized )
 				ofLogNotice( "ftVelocitySpheresShader initialized" );
@@ -27,6 +31,38 @@ namespace flowTools {
 		}
 		
 	protected:
+		void glOne()
+		{
+			string geometryShader;
+
+
+			ofLogWarning( "Velocity Dots not supported for GLSL 100" );
+
+			vertexShader = GLSL100(
+				void main()
+			{
+				gl_Position = gl_Vertex;
+				gl_FrontColor = gl_Color;
+			}
+			);
+
+			fragmentShader = GLSL100(
+				void main()
+			{
+				gl_FragColor = gl_Color;
+			}
+			);
+
+
+			ofLogVerbose( "Maximum number of output vertices support is: " + ofToString( shader.getGeometryMaxOutputCount() ) );
+			shader.setGeometryInputType( GL_POINTS );
+			shader.setGeometryOutputCount( 5 );
+			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
+			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+			bInitialized *= shader.linkProgram();
+
+		}
+
 		void glTwo() {
 			string geometryShader;
 			

@@ -15,10 +15,14 @@ namespace flowTools {
 
 			bInitialized = 1;
 
-			if( ofIsGLProgrammableRenderer() )
-				glThree();
-			else
+			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
+
+			if( glslVer == "OpenGL ES GLSL ES 1.00" )
+				glOne();
+			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
 				glTwo();
+			else if( ofIsGLProgrammableRenderer() )
+				glThree();
 
 			if( bInitialized )
 				ofLogNotice( "ftSmokeBuoyancyShader initialized" );
@@ -27,6 +31,40 @@ namespace flowTools {
 		}
 		
 	protected:
+		void glOne()
+		{
+			fragmentShader = GLSL100(
+				uniform sampler2DRect Velocity;
+			uniform sampler2DRect Temperature;
+			uniform sampler2DRect Density;
+
+			uniform float AmbientTemperature;
+			uniform float TimeStep;
+			uniform float Sigma;
+			uniform float Kappa;
+
+			uniform vec2  Gravity;
+
+			void main()
+			{
+				vec2 st = gl_TexCoord[ 0 ].st;
+
+				float T = texture2DRect( Temperature, st ).r;
+				vec2 V = texture2DRect( Velocity, st ).rg;
+
+				//   gl_FragColor = vec4(0);
+				//   if (T > AmbientTemperature) {
+				float D = length( texture2DRect( Density, st ).rgb );
+				gl_FragColor = vec4( ( TimeStep * ( T - AmbientTemperature ) * Sigma - D * Kappa ) * Gravity, 0.0, 0.0 );
+				//   }
+			}
+
+			);
+
+			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+			bInitialized *= shader.linkProgram();
+		}
+
 		void glTwo() {
 			fragmentShader = GLSL120(
 								  uniform sampler2DRect Velocity;

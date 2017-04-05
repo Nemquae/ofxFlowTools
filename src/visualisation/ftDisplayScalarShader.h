@@ -16,10 +16,14 @@ namespace flowTools {
 
 			bInitialized = 1;
 
-			if( ofIsGLProgrammableRenderer() )
-				glThree();
-			else
+			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
+
+			if( glslVer == "OpenGL ES GLSL ES 1.00" )
+				glOne();
+			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
 				glTwo();
+			else if( ofIsGLProgrammableRenderer() )
+				glThree();
 
 			if( bInitialized )
 				ofLogNotice( "ftDisplayScalarShader initialized" );
@@ -28,6 +32,25 @@ namespace flowTools {
 		}
 		
 	protected:
+		void glOne()
+		{
+			fragmentShader = GLSL100(
+				uniform sampler2DRect FloatTexture;
+			uniform float Scale;
+			void main()
+			{
+				vec4	velocity = texture2DRect( FloatTexture, gl_TexCoord[ 0 ].st );
+				velocity.xyz *= vec3( Scale );
+				velocity.w = pow( length( velocity.xyz ), 0.33 );
+				velocity.xyz += vec3( 0.5 );
+				gl_FragColor = velocity;
+			}
+			);
+
+			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+			bInitialized *= shader.linkProgram();
+		}
+
 		void glTwo() {
 			fragmentShader = GLSL120(
 								  uniform sampler2DRect FloatTexture;

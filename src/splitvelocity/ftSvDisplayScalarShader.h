@@ -16,10 +16,14 @@ namespace flowTools {
 
 			bInitialized = 1;
 
-			if( ofIsGLProgrammableRenderer() )
-				glThree();
-			else
+			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
+
+			if( glslVer == "OpenGL ES GLSL ES 1.00" )
+				glOne();
+			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
 				glTwo();
+			else if( ofIsGLProgrammableRenderer() )
+				glThree();
 
 			if( bInitialized )
 				ofLogNotice( "ftDisplayScalarShader initialized" );
@@ -28,6 +32,31 @@ namespace flowTools {
 		}
 		
 	protected:
+		void glOne()
+		{
+			fragmentShader = GLSL100(
+				uniform sampler2DRect FloatTexture;
+			uniform float Scale;
+			void main()
+			{
+				vec4 velocity = texture2DRect( FloatTexture, gl_TexCoord[ 0 ].st );
+
+				vec3 cLeft = vec3( velocity.x ) * vec3( 0.75, 0.00, 0.00 ); // red
+				vec3 cDown = vec3( velocity.y ) * vec3( 0.00, 0.09, 0.75 ); // blue
+				vec3 cRight = vec3( velocity.z ) * vec3( 0.00, 0.75, 0.17 ); // green
+				vec3 cUp = vec3( velocity.w ) * vec3( 0.75, 0.59, 0.00 ); // ocre
+
+				vec3 color = cLeft + cDown + cRight + cUp;
+				color *= vec3( Scale );
+
+				gl_FragColor = vec4( color, 1.0 );
+			}
+			);
+
+			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+			bInitialized *= shader.linkProgram();
+		}
+
 		void glTwo() {
 			fragmentShader = GLSL120(
 									 uniform sampler2DRect FloatTexture;

@@ -14,10 +14,14 @@ namespace flowTools {
 
 			bInitialized = 1;
 
-			if( ofIsGLProgrammableRenderer() )
-				glThree();
-			else
+			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
+
+			if( glslVer == "OpenGL ES GLSL ES 1.00" )
+				glOne();
+			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
 				glTwo();
+			else if( ofIsGLProgrammableRenderer() )
+				glThree();
 
 			if( bInitialized )
 				ofLogNotice( "ftLuminanceShader initialized" );
@@ -26,6 +30,24 @@ namespace flowTools {
 		}
 		
 	protected:
+		void glOne()
+		{
+			fragmentShader = GLSL100(
+				uniform sampler2DRect tex0;
+
+			void main()
+			{
+				vec4 color = texture2DRect( tex0, gl_TexCoord[ 0 ].st );
+				float p = 0.3 *color.g + 0.59*color.r + 0.11*color.b;
+				color.xyz = vec3( p, p, p );
+				gl_FragColor = color;
+			}
+			);
+
+			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+			bInitialized *= shader.linkProgram();
+		}
+
 		void glTwo() {
 			fragmentShader = GLSL120(
 									 uniform sampler2DRect tex0;

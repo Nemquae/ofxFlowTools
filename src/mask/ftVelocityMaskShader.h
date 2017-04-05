@@ -16,10 +16,14 @@ namespace flowTools {
 
 			bInitialized = 1;
 
-			if( ofIsGLProgrammableRenderer() )
-				glThree();
-			else
+			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
+
+			if( glslVer == "OpenGL ES GLSL ES 1.00" )
+				glOne();
+			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
 				glTwo();
+			else if( ofIsGLProgrammableRenderer() )
+				glThree();
 
 			if( bInitialized )
 				ofLogNotice( "ftVelocityMaskShader initialized" );
@@ -28,6 +32,36 @@ namespace flowTools {
 		}
 		
 	protected:
+		void glOne()
+		{
+
+			fragmentShader = GLSL100(
+				uniform sampler2DRect	colorTex;
+			uniform sampler2DRect	velocityTex;
+			uniform float	force;
+			uniform vec2 colorScale;
+			uniform vec2 velocityScale;
+
+			void main()
+			{
+				vec2 stc = gl_TexCoord[ 0 ].xy * colorScale;
+				vec2 stv = gl_TexCoord[ 0 ].xy * velocityScale;
+
+				vec4 color = texture2DRect( colorTex, stc );
+				vec4 vel = texture2DRect( velocityTex, stv );
+				float alpha = length( vel.xy ) * force;
+				color.rgb *= vec3( alpha );
+				color.w = alpha;
+
+				gl_FragColor = color;
+			}
+			);
+
+			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+			bInitialized *= shader.linkProgram();
+
+		}
+
 		void glTwo() {
 			
 			fragmentShader = GLSL120(

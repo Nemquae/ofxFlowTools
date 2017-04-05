@@ -16,10 +16,14 @@ namespace flowTools {
 
 			bInitialized = 1;
 
-			if( ofIsGLProgrammableRenderer() )
-				glThree();
-			else
+			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
+
+			if( glslVer == "OpenGL ES GLSL ES 1.00" )
+				glOne();
+			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
 				glTwo();
+			else if( ofIsGLProgrammableRenderer() )
+				glThree();
 
 			if( bInitialized )
 				ofLogNotice( "ftMoveParticleShader initialized" );
@@ -28,6 +32,53 @@ namespace flowTools {
 		}
 		
 	protected:
+		void glOne()
+		{
+
+			fragmentShader = GLSL100(
+				uniform sampler2DRect Backbuffer;
+			uniform sampler2DRect ALMSTexture;
+			uniform sampler2DRect Velocity;
+			uniform sampler2DRect HomeTexture;
+			uniform float TimeStep;
+			uniform float InverseCellSize;
+			uniform vec2	Scale;
+			uniform vec2	Dimensions;
+			uniform vec2	Gravity;
+
+			void main()
+			{
+				vec2 st = gl_TexCoord[ 0 ].st;
+				vec2 particlePos = texture2DRect( Backbuffer, st ).xy;
+
+				vec4 alms = texture2DRect( ALMSTexture, st );
+				float age = alms.x;
+				float life = alms.y;
+				float mass = alms.z;
+
+				if( age > 0.0 )
+				{
+					vec2 st2 = particlePos * Scale;
+					vec2 u = texture2DRect( Velocity, st2 ).rg / Scale;
+					vec2 coord = TimeStep * InverseCellSize * u;
+
+					particlePos += coord * ( 1.0 / mass ) + Gravity;
+				}
+				else
+				{
+					particlePos = texture2DRect( HomeTexture, st ).xy;
+				}
+
+
+				gl_FragColor = vec4( particlePos, 0.0, 1.0 ); ;
+			}
+			);
+
+			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+			bInitialized *= shader.linkProgram();
+
+		}
+
 		void glTwo() {
 			
 			fragmentShader = GLSL120(
