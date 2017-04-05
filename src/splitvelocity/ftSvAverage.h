@@ -56,6 +56,5 @@ namespace flowTools {
 		int	height;
 		int	pixelCount;
 		
-		
 	};
 }

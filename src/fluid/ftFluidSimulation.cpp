@@ -36,6 +36,12 @@
 
 #include "ftFluidSimulation.h"
 
+#if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
+#include "gl32.h"
+#include "gl2ext.h"
+#include "ofColor.h"
+#endif
+
 namespace flowTools {
 	
 	ftFluidSimulation::ftFluidSimulation(){
@@ -394,9 +400,11 @@ namespace flowTools {
 			//	_tex,
 			//	_strength);
 			//whiteSwapBuffer.swap();
+            
+            ofFloatColor color = ofFloatColor(1.0, 0.0);
 
 			mixForceShader.update(*whiteSwapBuffer.getBuffer(),
-				_tex, ofFloatColor(1.0, 0.0));
+				_tex, color);
 				//whiteSwapBuffer.getBackTexture(), ofFloatColor(1.0, 0.0));
 
 			whiteSwapBuffer.swap();

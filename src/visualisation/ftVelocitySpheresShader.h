@@ -126,9 +126,19 @@ namespace flowTools {
 			shader.setUniform1f("minDotSize", _minDotSize);
 			shader.setUniform1f("maxDotSize", _maxDotSize);
 			
-			glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+            #if !((TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS))
+            glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+            #else
+            glEnable(GL_POINT_SMOOTH);
+            #endif
+            
 			_fieldVbo.draw(GL_POINTS, 0, _fieldVbo.getNumVertices());
-			glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
+            
+            #if !((TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS))
+            glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
+            #else
+            glDisable(GL_POINT_SMOOTH);
+            #endif
 			
 			shader.end();
 		}

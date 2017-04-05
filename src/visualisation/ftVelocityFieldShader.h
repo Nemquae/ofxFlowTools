@@ -4,6 +4,11 @@
 #include "ofMain.h"
 #include "ftShader.h"
 
+#if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
+#include "gl32.h"
+#include "gl2ext.h"
+#endif
+
 namespace flowTools {
 	
 	class ftVelocityFieldShader : public ftShader {

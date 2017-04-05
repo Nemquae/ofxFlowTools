@@ -4,6 +4,10 @@
 #include "ofMain.h"
 #include "ftShader.h"
 
+#if defined(__APPPLE__)
+#include <OpenGLES/ES3/gl.h>
+#include <OpenGLES/ES3/glext.h>
+#endif
 
 namespace flowTools {
 	
@@ -140,11 +144,19 @@ namespace flowTools {
 			
 			bool dinges = true;
 			//glEnable(GL_POINT_SMOOTH);
+            #if !((TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS))
 			glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+            #else
+            glEnable(GL_POINT_SMOOTH);
+            #endif
 			
 			particleVbo.draw();
 			
+            #if !((TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS))
 			glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
+            #else
+            glDisable(GL_POINT_SMOOTH);
+            #endif
 			//glDisable(GL_POINT_SMOOTH);
 			shader.end();
 			

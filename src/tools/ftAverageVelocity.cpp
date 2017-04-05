@@ -8,6 +8,11 @@
 
 #include "ftAverageVelocity.h"
 
+#if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
+#include "gl32.h"
+#include "gl2ext.h"
+#endif
+
 namespace flowTools {
 	
 	void ftAverageVelocity::setup(int _width, int _height, string _name) {
@@ -49,7 +54,11 @@ namespace flowTools {
 		
 		ofSetPixelStoreiAlignment(GL_PACK_ALIGNMENT,width,4,2);
 		glBindTexture(data.textureTarget, data.textureID);
+        #if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
+        glReadPixels(0, 0, width, height, GL_RG, GL_FLOAT, floatPixelData);
+#else
 		glGetTexImage(data.textureTarget, 0, GL_RG, GL_FLOAT, floatPixelData);
+#endif
 		glBindTexture(data.textureTarget, 0);
 		
 		// ----- presumably slower method -----

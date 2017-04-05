@@ -2,6 +2,11 @@
 
 #include "ftSvAverage.h"
 
+#if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
+#include "gl32.h"
+#include "gl2ext.h"
+#endif
+
 // TO FTSPILTVELOCITYAVERAGE
 
 namespace flowTools {
@@ -29,7 +34,7 @@ namespace flowTools {
 		parameters.add(pTotalMagnitude.set("total mag", "0"));
 		parameters.add(pMeanMagnitude.set("mean mag", "0"));
 		parameters.add(pStdevMagnitude.set("stdev mag", "0"));
-		
+            
 	}
 	
 	void ftSvAverage::setTexture(ofTexture _texture) {
@@ -46,7 +51,11 @@ namespace flowTools {
 		// read to pixels
 		ofSetPixelStoreiAlignment(GL_PACK_ALIGNMENT,width,4,4);
 		glBindTexture(texData.textureTarget, texData.textureID);
+        #if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
+        glReadPixels(0, 0, width, height, GL_RGBA, GL_FLOAT, pixels.getData());
+        #else
 		glGetTexImage(texData.textureTarget, 0, GL_RGBA, GL_FLOAT, pixels.getData());
+        #endif
 		glBindTexture(texData.textureTarget, 0);
 		float* floatPixelData = pixels.getData();
 		
