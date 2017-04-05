@@ -51,11 +51,11 @@ namespace flowTools {
 			uniform float			inverseY;
 			uniform float			FlowPower;
                                      
-            varying vec2            texCoord;
+            varying vec4            texCoord;
 
 			void main()
 			{
-				vec2 st = texCoord;
+				vec2 st = texCoord.st;
 
 				vec2	off_x = vec2( offset, 0.0 );
 				vec2	off_y = vec2( 0.0, offset );

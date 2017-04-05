@@ -40,9 +40,14 @@ namespace flowTools {
         void glOne()  {
             
             vertexShader = GLSL100(
+                                   attribute vec4 inVertex;
+                                   attribute vec4 inColor;
+                                   
+                                   varying vec4 texCoord;
+                                   
                                    void main() {
-                                       gl_Position = gl_Vertex;
-                                       gl_FrontColor = gl_Color;
+                                       gl_Position = inVertex;
+                                       texCoord = inColor;
                                    }
                                    );
             
