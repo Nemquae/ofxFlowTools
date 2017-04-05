@@ -2,9 +2,9 @@
 
 #include "ofMain.h"
 
-#define GLSL100(shader)  "#version 100 \n #extension GL_ARB_texture_rectangle : enable \n" #shader
-#define GLSL100PI(shader)  "#version 100 \n #extension GL_ARB_texture_rectangle : enable \n #define PI 3.1415926535897932 \n #define HALF_PI 1.5707963267948966 \n" #shader
-#define GLSL100GEO(shader)  "#version 100 \n #extension GL_ARB_texture_rectangle : enable \n #extension GL_EXT_geometry_shader4: enable \n" #shader
+#define GLSL100(shader)  "#version 100 \n precision mediump float; \n precision mediump sampler2D; \n" #shader
+#define GLSL100PI(shader)  "#version 100 \n #define PI 3.1415926535897932 \n #define HALF_PI 1.5707963267948966 \n precision mediump float; \n precision mediump sampler2D; \n" #shader
+#define GLSL100GEO(shader)  "#version 100 \n #extension GL_EXT_geometry_shader4: enable \n precision mediump float; \n precision mediump sampler2D; \n" #shader
 
 #define GLSL120(shader)  "#version 120 \n #extension GL_ARB_texture_rectangle : enable \n" #shader
 #define GLSL120PI(shader)  "#version 120 \n #extension GL_ARB_texture_rectangle : enable \n #define PI 3.1415926535897932 \n #define HALF_PI 1.5707963267948966 \n" #shader

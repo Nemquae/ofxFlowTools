@@ -40,8 +40,9 @@ namespace flowTools {
 		void glOne()
 		{
 			fragmentShader = GLSL100(
-				uniform sampler2DRect	CurrTexture;
-			uniform sampler2DRect	LastTexture;
+            
+            uniform sampler2D       CurrTexture;
+			uniform sampler2D       LastTexture;
 			uniform float			force;
 			uniform float			offset;
 			uniform float			lambda;
@@ -49,23 +50,25 @@ namespace flowTools {
 			uniform float			inverseX;
 			uniform float			inverseY;
 			uniform float			FlowPower;
+                                     
+            varying vec2            texCoord;
 
 			void main()
 			{
-				vec2 st = gl_TexCoord[ 0 ].st;
+				vec2 st = texCoord;
 
 				vec2	off_x = vec2( offset, 0.0 );
 				vec2	off_y = vec2( 0.0, offset );
 
 				//get the difference
-				vec4 scr_dif = texture2DRect( CurrTexture, st ) - texture2DRect( LastTexture, st );
+				vec4 scr_dif = texture2D( CurrTexture, st ) - texture2D( LastTexture, st );
 
 				//calculate the gradient
 				vec4 gradx; vec4 grady; vec4 gradmag; vec4 vx; vec4 vy;
-				gradx = texture2DRect( LastTexture, st + off_x ) - texture2DRect( LastTexture, st - off_x );
-				gradx += texture2DRect( CurrTexture, st + off_x ) - texture2DRect( CurrTexture, st - off_x );
-				grady = texture2DRect( LastTexture, st + off_y ) - texture2DRect( LastTexture, st - off_y );
-				grady += texture2DRect( CurrTexture, st + off_y ) - texture2DRect( CurrTexture, st - off_y );
+				gradx = texture2D( LastTexture, st + off_x ) - texture2D( LastTexture, st - off_x );
+				gradx += texture2D( CurrTexture, st + off_x ) - texture2D( CurrTexture, st - off_x );
+				grady = texture2D( LastTexture, st + off_y ) - texture2D( LastTexture, st - off_y );
+				grady += texture2D( CurrTexture, st + off_y ) - texture2D( CurrTexture, st - off_y );
 
 				gradmag = sqrt( ( gradx*gradx ) + ( grady*grady ) + vec4( lambda ) );
 				vx = scr_dif*( gradx / gradmag );
@@ -100,6 +103,8 @@ namespace flowTools {
 			);
 
 			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+            bInitialized *= shader.setupShaderFromSource(GL_VERTEX_SHADER, vertexShader);
+            bInitialized *= shader.bindDefaults();
 			bInitialized *= shader.linkProgram();
 
 		}
