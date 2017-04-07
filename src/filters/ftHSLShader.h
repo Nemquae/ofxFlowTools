@@ -34,10 +34,13 @@ namespace flowTools {
 		void glOne()
 		{
 			fragmentShader = GLSL100(
-				uniform sampler2DRect tex0;
+
+			uniform sampler2D tex0;
 			uniform float hue;
 			uniform float saturation;
 			uniform float lightness;
+
+			varying vec4	texCoord;
 
 			vec3 RGBToHSL( vec3 color )
 			{
@@ -121,7 +124,7 @@ namespace flowTools {
 
 			void main()
 			{
-				vec4 color = texture2DRect( tex0, gl_TexCoord[ 0 ].st );
+				vec4 color = texture2D( tex0, texCoord.st );
 				vec3 hsl = RGBToHSL( color.xyz );
 				hsl.x += hue;
 				hsl.y *= saturation;

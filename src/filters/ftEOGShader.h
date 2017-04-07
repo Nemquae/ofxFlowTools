@@ -33,14 +33,17 @@ namespace flowTools {
 		void glOne()
 		{
 			fragmentShader = GLSL100(
-				uniform sampler2DRect tex0;
+
+			uniform sampler2D tex0;
 			uniform float exposure;
 			uniform float offset;
 			uniform float gamma;
 
+			varying vec4	texCoord;
+
 			void main()
 			{
-				vec4 color = texture2DRect( tex0, gl_TexCoord[ 0 ].st );
+				vec4 color = texture2D( tex0, texCoord.st );
 				vec3 eog = pow( ( color.xyz * vec3( exposure ) ) + vec3( offset ), vec3( 1.0 / gamma ) );
 				gl_FragColor = vec4( eog, color.w );
 			}

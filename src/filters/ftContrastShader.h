@@ -35,13 +35,16 @@ namespace flowTools {
 		void glOne()
 		{
 			fragmentShader = GLSL100(
-				uniform sampler2DRect tex0;
+
+			uniform sampler2D tex0;
 			uniform float contrast;
 			uniform float brightness;
 
+			varying vec4	texCoord;
+
 			void main()
 			{
-				vec4 color = texture2DRect( tex0, gl_TexCoord[ 0 ].st );
+				vec4 color = texture2D( tex0, texCoord.st );
 				float alpha = color.a;
 				float p = 0.3 *color.g + 0.59*color.r + 0.11*color.b;
 				p = p * brightness;

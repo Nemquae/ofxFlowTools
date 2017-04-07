@@ -40,10 +40,12 @@ namespace flowTools {
 			uniform float	EdgeSmooth;
 			uniform vec4		Value;
 
+			varying vec4	texCoord;
+
 			void main()
 			{
 				vec4 color = Value;
-				float d = distance( Point, gl_TexCoord[ 0 ].st );
+				float d = distance( Point, texCoord.st );
 				float a = max( ( Radius - d ) / Radius, 0.0 );
 				float c = ceil( a );
 				color.xyz *= c;//= mix(color.xyz, vec3(1, 1, 1), 1.0 - c);
