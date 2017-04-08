@@ -50,13 +50,15 @@ protected:
 	{
 		fragmentShader = GLSL100(
 
-			uniform sampler2DRect Backbuffer;
+		uniform sampler2D Backbuffer;
+
+		varying vec4	texCoord;
 
 		void main()
 		{
-			vec2 st = gl_TexCoord[ 0 ].st;
+			vec2 st = texCoord.st;
 
-			vec4 color = texture2DRect( Backbuffer, st );
+			vec4 color = texture2D( Backbuffer, st );
 
 			//if (color.w > 0.1)
 			//{

@@ -34,9 +34,10 @@ namespace flowTools {
 		void glOne()
 		{
 			fragmentShader = GLSL100(
-				uniform sampler2DRect Velocity;
-			uniform sampler2DRect Temperature;
-			uniform sampler2DRect Density;
+
+			uniform sampler2D Velocity;
+			uniform sampler2D Temperature;
+			uniform sampler2D Density;
 
 			uniform float AmbientTemperature;
 			uniform float TimeStep;
@@ -45,16 +46,18 @@ namespace flowTools {
 
 			uniform vec2  Gravity;
 
+			varying vec4	texCoord;
+
 			void main()
 			{
-				vec2 st = gl_TexCoord[ 0 ].st;
+				vec2 st = texCoord.st;
 
-				float T = texture2DRect( Temperature, st ).r;
-				vec2 V = texture2DRect( Velocity, st ).rg;
+				float T = texture2D( Temperature, st ).r;
+				vec2 V = texture2D( Velocity, st ).rg;
 
 				//   gl_FragColor = vec4(0);
 				//   if (T > AmbientTemperature) {
-				float D = length( texture2DRect( Density, st ).rgb );
+				float D = length( texture2D( Density, st ).rgb );
 				gl_FragColor = vec4( ( TimeStep * ( T - AmbientTemperature ) * Sigma - D * Kappa ) * Gravity, 0.0, 0.0 );
 				//   }
 			}

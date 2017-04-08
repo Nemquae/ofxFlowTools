@@ -39,19 +39,22 @@ namespace flowTools {
 		void glOne()
 		{
 			vertexShader = GLSL100(
-				uniform sampler2DRect positionTexture;
-			uniform sampler2DRect ALMSTexture;
+
+			uniform sampler2D positionTexture;
+			uniform sampler2D ALMSTexture;
 			uniform float TwinkleSpeed;
 			uniform vec4 Color;
+
+			varying vec4	texCoord;
 
 			void main()
 			{
 
 				vec2 st = gl_Vertex.xy;
 
-				vec2 texPos = texture2DRect( positionTexture, st ).xy;
+				vec2 texPos = texture2D( positionTexture, st ).xy;
 				gl_Position = gl_ModelViewProjectionMatrix * vec4( texPos, 0.0, 1.0 );
-				vec4 alms = texture2DRect( ALMSTexture, st );
+				vec4 alms = texture2D( ALMSTexture, st );
 				float age = alms.x;
 				float life = alms.y;
 				float mass = alms.z;

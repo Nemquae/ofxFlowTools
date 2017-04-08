@@ -52,26 +52,29 @@ namespace flowTools {
 			);
 
 			geometryShader = GLSL100GEO(
-				uniform sampler2DRect velocityTexture;
-			uniform sampler2DRect temperatureTexture;
+
+			uniform sampler2D velocityTexture;
+			uniform sampler2D temperatureTexture;
 			uniform vec2 texResolution;
 			uniform float velocityScale;
 			uniform float temperatureScale;
 			uniform float maxArrowSize;
+
+			varying vec4	posCoord;
 
 			void main()
 			{
 
 				vec4 lineStart = gl_PositionIn[ 0 ];
 				vec2 uv = lineStart.xy * texResolution;
-				vec2 velocity = texture2DRect( velocityTexture, uv ).xy * velocityScale;
+				vec2 velocity = texture2D( velocityTexture, uv ).xy * velocityScale;
 				if( length( velocity ) > maxArrowSize )
 					velocity = normalize( velocity ) * maxArrowSize;
 				vec4 lineEnd = lineStart + vec4( velocity, 0.0, 0.0 );
 
 				float alpha = 0.3 + 0.3 * ( length( velocity ) / maxArrowSize );
 
-				float temperature = texture2DRect( temperatureTexture, uv ).x * temperatureScale;
+				float temperature = texture2D( temperatureTexture, uv ).x * temperatureScale;
 				float warm = pow( max( 0.0, temperature ), 0.5 );
 				float cold = pow( max( 0.0, -temperature ), 0.5 );
 				float red = 1.0 - cold;

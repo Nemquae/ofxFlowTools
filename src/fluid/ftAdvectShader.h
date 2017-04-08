@@ -35,26 +35,29 @@ namespace flowTools {
 		void glOne()
 		{
 			fragmentShader = GLSL100(
-				uniform sampler2DRect Backbuffer;
-			uniform sampler2DRect Obstacle;
-			uniform sampler2DRect Velocity;
+
+			uniform sampler2D Backbuffer;
+			uniform sampler2D Obstacle;
+			uniform sampler2D Velocity;
 
 			uniform float TimeStep;
 			uniform float Dissipation;
 			uniform float InverseCellSize;
 			uniform vec2	Scale;
 
+			varying vec4	texCoord;
+
 			void main()
 			{
-				vec2 st = gl_TexCoord[ 0 ].st;
+				vec2 st = texCoord.st;
 				vec2 st2 = st * Scale;
 
-				float inverseSolid = 1.0 - ceil( texture2DRect( Obstacle, st2 ).x - 0.5 );
+				float inverseSolid = 1.0 - ceil( texture2D( Obstacle, st2 ).x - 0.5 );
 
-				vec2 u = texture2DRect( Velocity, st2 ).rg / Scale;
+				vec2 u = texture2D( Velocity, st2 ).rg / Scale;
 				vec2 coord = st - TimeStep * InverseCellSize * u;
 
-				gl_FragColor = Dissipation * texture2DRect( Backbuffer, coord ) * inverseSolid;
+				gl_FragColor = Dissipation * texture2D( Backbuffer, coord ) * inverseSolid;
 
 			}
 

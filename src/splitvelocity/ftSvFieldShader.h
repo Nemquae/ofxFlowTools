@@ -37,7 +37,8 @@ namespace flowTools {
 
 
 			vertexShader = GLSL100(
-				void main()
+
+			void main()
 			{
 				gl_Position = gl_Vertex;
 				gl_FrontColor = gl_Color;
@@ -52,19 +53,22 @@ namespace flowTools {
 			);
 
 			geometryShader = GLSL100GEO(
-				uniform sampler2DRect fieldTexture;
+
+			uniform sampler2D fieldTexture;
 			uniform vec2 texResolution;
 			uniform vec4 baseColor;
 			uniform float vectorSize;
 			uniform float maxArrowSize;
 
+			varying vec4	posCoord;
+
 			void main()
 			{
 
-				vec4 lineStart = gl_PositionIn[ 0 ];
+				vec4 lineStart = posCoord;
 				vec2 uv = lineStart.xy * texResolution;
 
-				vec4 splitVelocity = texture2DRect( fieldTexture, uv ) * vectorSize;
+				vec4 splitVelocity = texture2D( fieldTexture, uv ) * vectorSize;
 
 				vec2 pVel = splitVelocity.xy;
 				if( length( pVel ) > maxArrowSize )

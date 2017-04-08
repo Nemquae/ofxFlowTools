@@ -35,17 +35,20 @@ namespace flowTools {
 		void glOne()
 		{
 			fragmentShader = GLSL100(
-				uniform sampler2DRect Texture;
+
+			uniform sampler2D Texture;
 			uniform float Min;
 			uniform float Range;
 			uniform vec2	Scale;
 
+			varying vec4	texCoord;
+
 			void main()
 			{
-				vec2 st = gl_TexCoord[ 0 ].st;
+				vec2 st = texCoord.st;
 				vec2 st2 = st * Scale;
 
-				vec4 color = texture2DRect( Texture, st );
+				vec4 color = texture2D( Texture, st );
 
 				float magnitude = length( color ) - Min;
 				if( magnitude > 0.0 )

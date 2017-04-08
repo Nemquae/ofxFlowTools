@@ -57,18 +57,21 @@ namespace flowTools {
 			);
 
 			geometryShader = GLSL100GEO(
-				uniform sampler2DRect fieldTexture;
+
+			uniform sampler2D fieldTexture;
 			uniform vec2 texResolution;
 			uniform vec4 baseColor;
 			uniform float vectorSize;
 			uniform float maxArrowSize;
 
+			varying vec4	posCoord;
+
 			void main()
 			{
 
-				vec4 lineStart = gl_PositionIn[ 0 ];
+				vec4 lineStart = posCoord;
 				vec2 uv = lineStart.xy * texResolution;
-				vec2 line = texture2DRect( fieldTexture, uv ).xy * vectorSize;
+				vec2 line = texture2D( fieldTexture, uv ).xy * vectorSize;
 				if( length( line ) > maxArrowSize )
 					line = normalize( line ) * maxArrowSize;
 				vec4 lineEnd = lineStart + vec4( line, 0.0, 0.0 );

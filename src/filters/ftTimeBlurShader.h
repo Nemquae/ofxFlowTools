@@ -43,27 +43,30 @@ namespace flowTools {
 		void glOne()
 		{
 			string fragmentHorizontalBlurShader = GLSL100(
-				uniform sampler2DRect backbuffer;
+
+			uniform sampler2D backbuffer;
 			uniform float radius;
+
+			varying vec4	texCoord;
 
 			const float total = ( 1. + 8. + 28. + 56. ) * 2. + 70.;
 
 			void main( void )
 			{
-				vec2 st = gl_TexCoord[ 0 ].st;
+				vec2 st = texCoord.st;
 
 				vec4 color = vec4( 0.0, 0.0, 0.0, 0.0 );
-				color += ( 1. / total ) * texture2DRect( backbuffer, st - radius * vec2( 4. / 4., 0. ) );
-				color += ( 8. / total )  * texture2DRect( backbuffer, st - radius * vec2( 3. / 4., 0. ) );
-				color += ( 28. / total )  * texture2DRect( backbuffer, st - radius * vec2( 2. / 4., 0. ) );
-				color += ( 56. / total )  * texture2DRect( backbuffer, st - radius * vec2( 1. / 4., 0. ) );
+				color += ( 1. / total ) * texture2D( backbuffer, st - radius * vec2( 4. / 4., 0. ) );
+				color += ( 8. / total )  * texture2D( backbuffer, st - radius * vec2( 3. / 4., 0. ) );
+				color += ( 28. / total )  * texture2D( backbuffer, st - radius * vec2( 2. / 4., 0. ) );
+				color += ( 56. / total )  * texture2D( backbuffer, st - radius * vec2( 1. / 4., 0. ) );
 
-				color += ( 70. / total ) * texture2DRect( backbuffer, st );
+				color += ( 70. / total ) * texture2D( backbuffer, st );
 
-				color += ( 1. / total ) * texture2DRect( backbuffer, st + radius * vec2( 4. / 4., 0. ) );
-				color += ( 8. / total )  * texture2DRect( backbuffer, st + radius * vec2( 3. / 4., 0. ) );
-				color += ( 28. / total )  * texture2DRect( backbuffer, st + radius * vec2( 2. / 4., 0. ) );
-				color += ( 56. / total )  * texture2DRect( backbuffer, st + radius * vec2( 1. / 4., 0. ) );
+				color += ( 1. / total ) * texture2D( backbuffer, st + radius * vec2( 4. / 4., 0. ) );
+				color += ( 8. / total )  * texture2D( backbuffer, st + radius * vec2( 3. / 4., 0. ) );
+				color += ( 28. / total )  * texture2D( backbuffer, st + radius * vec2( 2. / 4., 0. ) );
+				color += ( 56. / total )  * texture2D( backbuffer, st + radius * vec2( 1. / 4., 0. ) );
 
 				gl_FragColor = color;
 			}
@@ -73,7 +76,8 @@ namespace flowTools {
 			bInitialized *= blurShader[ 0 ].linkProgram();
 
 			string fragmentVerticalBlurShader = GLSL120(
-				uniform sampler2DRect backbuffer;
+
+			uniform sampler2DRect backbuffer;
 			uniform float radius;
 
 			const float total = ( 1. + 8. + 28. + 56. ) * 2. + 70.;

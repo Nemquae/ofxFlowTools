@@ -52,17 +52,20 @@ namespace flowTools {
 			);
 
 			geometryShader = GLSL100GEO(
-				uniform sampler2DRect pressureTexture;
+
+			uniform sampler2D pressureTexture;
 			uniform vec2 texResolution;
 			uniform float pressureScale;
 			uniform float maxRadius;
 
+			varying vec4	posCoord;
+
 			void main()
 			{
-				vec4 centre = gl_PositionIn[ 0 ];
+				vec4 centre = posCoord;
 				vec2 uv = centre.xy * texResolution;
 
-				float pressure = texture2DRect( pressureTexture, uv ).x * pressureScale;
+				float pressure = texture2D( pressureTexture, uv ).x * pressureScale;
 				pressure = min( pressure, maxRadius );
 				pressure = max( pressure, -maxRadius );
 				float aspectRatio = texResolution.x / texResolution.y;

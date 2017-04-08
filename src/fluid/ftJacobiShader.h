@@ -35,43 +35,46 @@ namespace flowTools {
 		{
 
 			fragmentShader = GLSL100(
-				uniform sampler2DRect Pressure;
-			uniform sampler2DRect Divergence;
-			uniform sampler2DRect Obstacle;
+
+			uniform sampler2D Pressure;
+			uniform sampler2D Divergence;
+			uniform sampler2D Obstacle;
 			uniform float Alpha;
 			//	   uniform float InverseBeta = 0.25;
 
-			void fTexNeighbors( sampler2DRect tex, vec2 st,
+			varying vec4	texCoord;
+
+			void fTexNeighbors( sampler2D tex, vec2 st,
 								out float left, out float right, out float bottom, out float top )
 			{
-				left = texture2DRect( tex, st - vec2( 1, 0 ) ).x;
-				right = texture2DRect( tex, st + vec2( 1, 0 ) ).x;
-				bottom = texture2DRect( tex, st - vec2( 0, 1 ) ).x;
-				top = texture2DRect( tex, st + vec2( 0, 1 ) ).x;
+				left = texture2D( tex, st - vec2( 1, 0 ) ).x;
+				right = texture2D( tex, st + vec2( 1, 0 ) ).x;
+				bottom = texture2D( tex, st - vec2( 0, 1 ) ).x;
+				top = texture2D( tex, st + vec2( 0, 1 ) ).x;
 			}
 
-			void fRoundTexNeighbors( sampler2DRect tex, vec2 st,
+			void fRoundTexNeighbors( sampler2D tex, vec2 st,
 									 out float left, out float right, out float bottom, out float top )
 			{
-				left = ceil( texture2DRect( tex, st - vec2( 1, 0 ) ).x - 0.5 ); // round not available
-				right = ceil( texture2DRect( tex, st + vec2( 1, 0 ) ).x - 0.5 );
-				bottom = ceil( texture2DRect( tex, st - vec2( 0, 1 ) ).x - 0.5 );
-				top = ceil( texture2DRect( tex, st + vec2( 0, 1 ) ).x - 0.5 );
+				left = ceil( texture2D( tex, st - vec2( 1, 0 ) ).x - 0.5 ); // round not available
+				right = ceil( texture2D( tex, st + vec2( 1, 0 ) ).x - 0.5 );
+				bottom = ceil( texture2D( tex, st - vec2( 0, 1 ) ).x - 0.5 );
+				top = ceil( texture2D( tex, st + vec2( 0, 1 ) ).x - 0.5 );
 			}
 
 			void main()
 			{
 
-				vec2 st = gl_TexCoord[ 0 ].st;
+				vec2 st = texCoord.st;
 
 				float pL; float pR; float pB; float pT;
 				fTexNeighbors( Pressure, st, pL, pR, pB, pT );
-				float pC = texture2DRect( Pressure, st ).x;
+				float pC = texture2D( Pressure, st ).x;
 
 				float oL; float oR; float oB; float oT;
 				fRoundTexNeighbors( Obstacle, st, oL, oR, oB, oT );
 
-				float bC = texture2DRect( Divergence, st ).x;
+				float bC = texture2D( Divergence, st ).x;
 
 				//   if (oL > 0.9) pL = pC;
 				//   if (oR > 0.9) pR = pC;

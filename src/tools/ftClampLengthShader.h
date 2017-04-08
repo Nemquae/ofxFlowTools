@@ -35,15 +35,18 @@ namespace flowTools {
 		void glOne()
 		{
 			fragmentShader = GLSL100(
-				uniform sampler2DRect Backbuffer;
+
+			uniform sampler2D Backbuffer;
 			uniform float MaxLength;
 			uniform float ClampForce;
 
+			varying vec4	texCoord;
+
 			void main()
 			{
-				vec2 st = gl_TexCoord[ 0 ].st;
+				vec2 st = texCoord.st;
 
-				vec4 color = texture2DRect( Backbuffer, st );
+				vec4 color = texture2D( Backbuffer, st );
 
 				float l = length( color.xyz );
 				if( l > MaxLength )

@@ -35,16 +35,19 @@ namespace flowTools {
 		void glOne()
 		{
 			fragmentShader = GLSL100(
-				uniform sampler2DRect VelocityTexture;
+
+			uniform sampler2D VelocityTexture;
 			uniform float Force;
 			uniform vec2	Scale;
 
+			varying vec4	texCoord;
+
 			void main()
 			{
-				vec2 st = gl_TexCoord[ 0 ].st;
+				vec2 st = texCoord.st;
 				vec2 st2 = st * Scale;
 
-				vec2 velocity = texture2DRect( VelocityTexture, st2 ).xy * Force;
+				vec2 velocity = texture2D( VelocityTexture, st2 ).xy * Force;
 				vec2 pVel = max( velocity, vec2( 0, 0 ) );
 				vec2 nVel = abs( min( velocity, vec2( 0, 0 ) ) );
 

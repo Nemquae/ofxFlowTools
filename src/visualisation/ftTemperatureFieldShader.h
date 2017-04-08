@@ -52,17 +52,20 @@ namespace flowTools {
 			);
 
 			geometryShader = GLSL100GEO(
-				uniform sampler2DRect temperatureTexture;
+
+			uniform sampler2D temperatureTexture;
 			uniform vec2 texResolution;
 			uniform float temperatureScale;
 			uniform float maxHeight;
 
+			varying vec4	posCoord;
+
 			void main()
 			{
-				vec4 lineStart = gl_PositionIn[ 0 ];
+				vec4 lineStart = posCoord;
 				vec2 uv = lineStart.xy * texResolution;
 
-				float temperature = texture2DRect( temperatureTexture, uv ).x * temperatureScale;
+				float temperature = texture2D( temperatureTexture, uv ).x * temperatureScale;
 				temperature = min( temperature, maxHeight );
 				temperature = max( temperature, -maxHeight );
 

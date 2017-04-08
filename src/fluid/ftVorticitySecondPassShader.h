@@ -33,37 +33,40 @@ namespace flowTools {
 		void glOne()
 		{
 			fragmentShader = GLSL100(
-				uniform sampler2DRect Vorticity;
+
+			uniform sampler2D Vorticity;
 			uniform float TimeStep;
 			uniform float ConfinementScale;
 			uniform float HalfInverseCellSize;
 
-			void v2TexNeighbors( sampler2DRect tex, vec2 st,
+			varying vec4	texCoord;
+
+			void v2TexNeighbors( sampler2D tex, vec2 st,
 								 out vec2 left, out vec2 right, out vec2 bottom, out vec2 top )
 			{
-				left = texture2DRect( tex, st - vec2( 1, 0 ) ).xy;
-				right = texture2DRect( tex, st + vec2( 1, 0 ) ).xy;
-				bottom = texture2DRect( tex, st - vec2( 0, 1 ) ).xy;
-				top = texture2DRect( tex, st + vec2( 0, 1 ) ).xy;
+				left = texture2D( tex, st - vec2( 1, 0 ) ).xy;
+				right = texture2D( tex, st + vec2( 1, 0 ) ).xy;
+				bottom = texture2D( tex, st - vec2( 0, 1 ) ).xy;
+				top = texture2D( tex, st + vec2( 0, 1 ) ).xy;
 			}
 
-			void fTexNeighbors( sampler2DRect tex, vec2 st,
+			void fTexNeighbors( sampler2D tex, vec2 st,
 								out float left, out float right, out float bottom, out float top )
 			{
-				left = texture2DRect( tex, st - vec2( 1, 0 ) ).x;
-				right = texture2DRect( tex, st + vec2( 1, 0 ) ).x;
-				bottom = texture2DRect( tex, st - vec2( 0, 1 ) ).x;
-				top = texture2DRect( tex, st + vec2( 0, 1 ) ).x;
+				left = texture2D( tex, st - vec2( 1, 0 ) ).x;
+				right = texture2D( tex, st + vec2( 1, 0 ) ).x;
+				bottom = texture2D( tex, st - vec2( 0, 1 ) ).x;
+				top = texture2D( tex, st + vec2( 0, 1 ) ).x;
 			}
 
 			void main()
 			{
 
-				vec2 st = gl_TexCoord[ 0 ].st;
+				vec2 st = texCoord.st;
 
 				float voL; float voR; float voB; float voT;
 				fTexNeighbors( Vorticity, st, voL, voR, voB, voT );
-				float voC = texture2DRect( Vorticity, st ).x;
+				float voC = texture2D( Vorticity, st ).x;
 
 				vec2 force = HalfInverseCellSize * vec2( abs( voT ) - abs( voB ), abs( voR ) - abs( voL ) );
 

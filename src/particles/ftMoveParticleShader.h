@@ -36,22 +36,25 @@ namespace flowTools {
 		{
 
 			fragmentShader = GLSL100(
-				uniform sampler2DRect Backbuffer;
-			uniform sampler2DRect ALMSTexture;
-			uniform sampler2DRect Velocity;
-			uniform sampler2DRect HomeTexture;
+
+			uniform sampler2D Backbuffer;
+			uniform sampler2D ALMSTexture;
+			uniform sampler2D Velocity;
+			uniform sampler2D HomeTexture;
 			uniform float TimeStep;
 			uniform float InverseCellSize;
 			uniform vec2	Scale;
 			uniform vec2	Dimensions;
 			uniform vec2	Gravity;
 
+			varying vec4	texCoord;
+
 			void main()
 			{
 				vec2 st = gl_TexCoord[ 0 ].st;
-				vec2 particlePos = texture2DRect( Backbuffer, st ).xy;
+				vec2 particlePos = texture2D( Backbuffer, st ).xy;
 
-				vec4 alms = texture2DRect( ALMSTexture, st );
+				vec4 alms = texture2D( ALMSTexture, st );
 				float age = alms.x;
 				float life = alms.y;
 				float mass = alms.z;
@@ -59,14 +62,14 @@ namespace flowTools {
 				if( age > 0.0 )
 				{
 					vec2 st2 = particlePos * Scale;
-					vec2 u = texture2DRect( Velocity, st2 ).rg / Scale;
+					vec2 u = texture2D( Velocity, st2 ).rg / Scale;
 					vec2 coord = TimeStep * InverseCellSize * u;
 
 					particlePos += coord * ( 1.0 / mass ) + Gravity;
 				}
 				else
 				{
-					particlePos = texture2DRect( HomeTexture, st ).xy;
+					particlePos = texture2D( HomeTexture, st ).xy;
 				}
 
 

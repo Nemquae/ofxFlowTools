@@ -35,11 +35,15 @@ namespace flowTools {
 		void glOne()
 		{
 			fragmentShader = GLSL100(
-				uniform sampler2DRect FloatTexture;
+
+			uniform sampler2D FloatTexture;
 			uniform float Scale;
+
+			varying vec4	texCoord;
+
 			void main()
 			{
-				vec4 velocity = texture2DRect( FloatTexture, gl_TexCoord[ 0 ].st );
+				vec4 velocity = texture2D( FloatTexture, texCoord.st );
 
 				vec3 cLeft = vec3( velocity.x ) * vec3( 0.75, 0.00, 0.00 ); // red
 				vec3 cDown = vec3( velocity.y ) * vec3( 0.00, 0.09, 0.75 ); // blue

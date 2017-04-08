@@ -35,15 +35,18 @@ namespace flowTools {
 		void glOne()
 		{
 			fragmentShader = GLSL100(
-				uniform sampler2DRect RedTexture;
+
+			uniform sampler2D RedTexture;
 			uniform vec2	Scale;
+
+			varying vec4	texCoord;
 
 			void main()
 			{
-				vec2 st = gl_TexCoord[ 0 ].st;
+				vec2 st = texCoord.st;
 				vec2 st2 = st * Scale;
 
-				vec4 color = texture2DRect( RedTexture, st );
+				vec4 color = texture2D( RedTexture, st );
 				gl_FragColor = vec4( color.x, color.x, color.x, 1.0 );
 			}
 

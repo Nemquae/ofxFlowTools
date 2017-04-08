@@ -36,10 +36,13 @@ namespace flowTools {
 		{
 
 			fragmentShader = GLSL100(
-				uniform vec2 Dimensions;
+
+			uniform vec2 Dimensions;
+			varying vec4	texCoord;
+
 			void main()
 			{
-				vec2 st = gl_TexCoord[ 0 ].st;
+				vec2 st = texCoord.st;
 
 				gl_FragColor = vec4( st, 0.0, 1.0 );
 

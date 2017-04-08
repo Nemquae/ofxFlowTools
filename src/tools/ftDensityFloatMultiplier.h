@@ -30,18 +30,21 @@ namespace flowTools {
 		void glOne()
 		{
 			fragmentShader = GLSL100(
-				uniform sampler2DRect Backbuffer;
-			uniform sampler2DRect AddTexture;
+
+			uniform sampler2D Backbuffer;
+			uniform sampler2D AddTexture;
 			uniform float force;
 			uniform vec2	Scale;
 
+			varying vec4	texCoord;
+
 			void main()
 			{
-				vec2 st = gl_TexCoord[ 0 ].st;
+				vec2 st = texCoord.st;
 				vec2 st2 = st * Scale;
 
-				vec4 color = texture2DRect( Backbuffer, st );
-				float multiplier = texture2DRect( AddTexture, st2 ).x * force;
+				vec4 color = texture2D( Backbuffer, st );
+				float multiplier = texture2D( AddTexture, st2 ).x * force;
 				color.xyz *= 1.0 - min( multiplier, 0.9 );
 
 				gl_FragColor = color;

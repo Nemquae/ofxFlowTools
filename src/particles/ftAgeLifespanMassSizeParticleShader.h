@@ -34,11 +34,13 @@ namespace flowTools {
 	protected:
 		void glOne()
 		{
-			fragmentShader = GLSL100( uniform sampler2DRect Backbuffer;
-			uniform sampler2DRect Position;
-			uniform sampler2DRect Velocity;
-			uniform sampler2DRect Density;
-			uniform sampler2DRect Obstacle;
+			fragmentShader = GLSL100( 
+				
+			uniform sampler2D Backbuffer;
+			uniform sampler2D Position;
+			uniform sampler2D Velocity;
+			uniform sampler2D Density;
+			uniform sampler2D Obstacle;
 			uniform vec2  Scale;
 			uniform float GlobalTime;
 			uniform float DeltaTime;
@@ -50,6 +52,8 @@ namespace flowTools {
 			uniform float MassSpread;
 			uniform float Size;
 			uniform float SizeSpread;
+
+			varying vec4	texCoord;
 
 			// hash based 3d value noise
 			float random( float p )
@@ -67,7 +71,7 @@ namespace flowTools {
 				vec2 st = gl_TexCoord[ 0 ].st;
 				vec2 st2 = st * Scale;
 
-				vec4 alms = texture2DRect( Backbuffer, st );
+				vec4 alms = texture2D( Backbuffer, st );
 				float p_age = alms.x;
 				float p_life = alms.y;
 				float p_mass = alms.z;
@@ -81,7 +85,7 @@ namespace flowTools {
 				if( p_age == 0.0 )
 				{
 					float birthRandom = noise( st * GlobalTime + 304.5 ) / BirthChance;
-					float speed = length( texture2DRect( Velocity, st2 ).rg / Scale );
+					float speed = length( texture2D( Velocity, st2 ).rg / Scale );
 					float birthFromVelocity = speed * BirthVelocityChance;
 					if( birthRandom > 0.001 && birthRandom < birthFromVelocity )
 					{
@@ -100,9 +104,9 @@ namespace flowTools {
 					p_age = 0.0;
 				}
 
-				vec2 particlePos = texture2DRect( Position, st ).xy;
+				vec2 particlePos = texture2D( Position, st ).xy;
 				particlePos *= Scale;
-				float inverseSolid = 1.0 - ceil( texture2DRect( Obstacle, particlePos ).x - 0.5 );
+				float inverseSolid = 1.0 - ceil( texture2D( Obstacle, particlePos ).x - 0.5 );
 				p_age *= inverseSolid;
 
 				gl_FragColor = vec4( p_age, p_life, p_mass, p_size );
