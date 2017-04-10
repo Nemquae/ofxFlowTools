@@ -38,20 +38,20 @@ namespace flowTools {
 
 			ofLogWarning( "Velocity Dots not supported for GLSL 100" );
 
-			vertexShader = GLSL100(
-				void main()
-			{
-				gl_Position = gl_Vertex;
-				gl_FrontColor = gl_Color;
-			}
-			);
-
-			fragmentShader = GLSL100(
-				void main()
-			{
-				gl_FragColor = gl_Color;
-			}
-			);
+//			vertexShader = GLSL100(
+//				void main()
+//			{
+//				gl_Position = gl_Vertex;
+//				gl_FrontColor = gl_Color;
+//			}
+//			);
+//
+//			fragmentShader = GLSL100(
+//				void main()
+//			{
+//				gl_FragColor = gl_Color;
+//			}
+//			);
 
 
 			ofLogVerbose( "Maximum number of output vertices support is: " + ofToString( shader.getGeometryMaxOutputCount() ) );

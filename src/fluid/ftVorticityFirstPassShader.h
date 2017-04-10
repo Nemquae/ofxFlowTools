@@ -81,8 +81,10 @@ namespace flowTools {
 			}
 			);
 
-			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
-			bInitialized *= shader.linkProgram();
+            bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+            bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
+            bInitialized *= shader.bindDefaults();
+            bInitialized *= shader.linkProgram();
 
 		}
 

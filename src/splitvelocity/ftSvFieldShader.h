@@ -100,7 +100,8 @@ namespace flowTools {
 			shader.setGeometryOutputCount( 3 );
 			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
 			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
-			bInitialized *= shader.setupShaderFromSource( GL_GEOMETRY_SHADER_EXT, geometryShader );
+            ofLogWarning( "Geometry Shaders not supported in GLSL ES 1.0");
+			//bInitialized *= shader.setupShaderFromSource( GL_GEOMETRY_SHADER_EXT, geometryShader );
 			bInitialized *= shader.linkProgram();
 
 		}

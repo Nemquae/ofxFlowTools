@@ -51,7 +51,7 @@ namespace flowTools {
 
 			void main()
 			{
-				vec2 st = gl_TexCoord[ 0 ].st;
+				vec2 st = texCoord.st;
 				vec2 particlePos = texture2D( Backbuffer, st ).xy;
 
 				vec4 alms = texture2D( ALMSTexture, st );
@@ -77,8 +77,10 @@ namespace flowTools {
 			}
 			);
 
-			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
-			bInitialized *= shader.linkProgram();
+            bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+            bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
+            bInitialized *= shader.bindDefaults();
+            bInitialized *= shader.linkProgram();
 
 		}
 

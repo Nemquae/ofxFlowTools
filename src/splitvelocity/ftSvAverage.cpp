@@ -3,8 +3,9 @@
 #include "ftSvAverage.h"
 
 #if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
-#include "gl32.h"
-#include "gl2ext.h"
+//#include "gl32.h"
+//#include "gl2ext.h"
+#define GL_RGBA32F GL_RGBA
 #endif
 
 // TO FTSPILTVELOCITYAVERAGE

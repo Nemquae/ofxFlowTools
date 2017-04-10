@@ -4,6 +4,11 @@
 #include "ofMain.h"
 #include "ftShader.h"
 
+#if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
+//#include "gl32.h"
+//#include "gl2ext.h"
+#define GL_GEOMETRY_SHADER_EXT -1
+#endif
 
 namespace flowTools {
 	
@@ -36,20 +41,20 @@ namespace flowTools {
 		{
 			string geometryShader;
 
-			vertexShader = GLSL100(
-				void main()
-			{
-				gl_Position = gl_Vertex;
-				gl_FrontColor = gl_Color;
-			}
-			);
-
-			fragmentShader = GLSL100(
-				void main()
-			{
-				gl_FragColor = gl_Color;
-			}
-			);
+//			vertexShader = GLSL100(
+//				void main()
+//			{
+//				gl_Position = gl_Vertex;
+//				gl_FrontColor = gl_Color;
+//			}
+//			);
+//
+//			fragmentShader = GLSL100(
+//				void main()
+//			{
+//				gl_FragColor = gl_Color;
+//			}
+//			);
 
 			geometryShader = GLSL100GEO(
 
@@ -113,7 +118,8 @@ namespace flowTools {
 			shader.setGeometryOutputCount( 5 );
 			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
 			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
-			bInitialized *= shader.setupShaderFromSource( GL_GEOMETRY_SHADER_EXT, geometryShader );
+			ofLogWarning("Geometry Shaders not supported by GLSL ES 1.0");
+            //bInitialized *= shader.setupShaderFromSource( GL_GEOMETRY_SHADER_EXT, geometryShader );
 			bInitialized *= shader.linkProgram();
 		}
 

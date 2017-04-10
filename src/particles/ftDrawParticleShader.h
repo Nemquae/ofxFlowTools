@@ -4,10 +4,10 @@
 #include "ofMain.h"
 #include "ftShader.h"
 
-#if defined(__APPPLE__)
-#include <OpenGLES/ES3/gl.h>
-#include <OpenGLES/ES3/glext.h>
-#endif
+//#if defined(__APPPLE__)
+//#include <OpenGLES/ES3/gl.h>
+//#include <OpenGLES/ES3/glext.h>
+//#endif
 
 namespace flowTools {
 	
@@ -44,16 +44,17 @@ namespace flowTools {
 			uniform sampler2D ALMSTexture;
 			uniform float TwinkleSpeed;
 			uniform vec4 Color;
+            uniform mat4 mvpMatrix;
 
-			varying vec4	texCoord;
+            varying vec4    vertCoord;
 
 			void main()
 			{
 
-				vec2 st = gl_Vertex.xy;
+				vec2 st = vertCoord.xy;
 
 				vec2 texPos = texture2D( positionTexture, st ).xy;
-				gl_Position = gl_ModelViewProjectionMatrix * vec4( texPos, 0.0, 1.0 );
+				gl_Position = mvpMatrix * vec4( texPos, 0.0, 1.0 );
 				vec4 alms = texture2D( ALMSTexture, st );
 				float age = alms.x;
 				float life = alms.y;
@@ -69,10 +70,14 @@ namespace flowTools {
 
 			}
 			);
+            
+            ofLogWarning( "Point Sprites not supported by GLSL ES 1.0");
 
 
-			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
-			bInitialized *= shader.linkProgram();
+			//bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
+            //bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+            //bInitialized *= shader.bindDefaults();
+			//bInitialized *= shader.linkProgram();
 
 
 		}
@@ -185,29 +190,46 @@ namespace flowTools {
 	public:
 		
 		void update(ofVboMesh &particleVbo, int _numParticles, ofTexture& _positionTexture, ofTexture& _ALMSTexture, float _twinkleSpeed, ofVec3f _color){
+            
+            std::stringstream ss;
+            ss << "GL Error 13 = " << glGetError() << std::endl;
+            ofLogNotice(ss.str());
+            
 			shader.begin();
 			shader.setUniformTexture("PositionTexture", _positionTexture, 0);
 			shader.setUniformTexture("ALMSTexture", _ALMSTexture, 1);
 			shader.setUniform1f("TwinkleSpeed", _twinkleSpeed);
 			shader.setUniform3f("Color", _color);
+            
+            ss.clear();
+            ss << "GL Error 14 = " << glGetError() << std::endl;
+            ofLogNotice(ss.str());
 			
 			bool dinges = true;
 			//glEnable(GL_POINT_SMOOTH);
             #if !((TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS))
 			glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
             #else
-            glEnable(GL_POINT_SMOOTH);
+            //glEnable(GL_BLEND);
             #endif
+            
+            ss.clear();
+            ss << "GL Error 15 = " << glGetError() << std::endl;
+            ofLogNotice(ss.str());
 			
 			particleVbo.draw();
 			
             #if !((TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS))
 			glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
             #else
-            glDisable(GL_POINT_SMOOTH);
+            //glDisable(GL_BLEND);
             #endif
 			//glDisable(GL_POINT_SMOOTH);
 			shader.end();
+            
+            ss.clear();
+            ss << "GL Error 16 = " << glGetError() << std::endl;
+            ofLogNotice(ss.str());
 			
 		}
 	};

@@ -32,6 +32,10 @@
 
 #include "ftDrawForce.h"
 
+#if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
+#define GL_RGBA32F GL_RGBA
+#endif
+
 namespace flowTools {
 	
 	ftDrawForce::ftDrawForce() {

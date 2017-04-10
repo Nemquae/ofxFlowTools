@@ -37,8 +37,12 @@
 #include "ftFluidSimulation.h"
 
 #if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
-#include "gl32.h"
-#include "gl2ext.h"
+//#include "gl32.h"
+//#include "gl2ext.h"
+#define GL_RGBA32F GL_RGBA
+#define GL_RG32F GL_RGB
+#define GL_R32F GL_RGB
+#define GL_R8 GL_RGB
 #include "ofColor.h"
 #endif
 

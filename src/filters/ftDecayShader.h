@@ -43,8 +43,8 @@ namespace flowTools {
 
 			void main()
 			{
-				vec4 color0 = texture2DRect( tex0, texCoord.st );
-				vec4 color1 = texture2DRect( tex1, texCoord.st );
+				vec4 color0 = texture2D( tex0, texCoord.st );
+				vec4 color1 = texture2D( tex1, texCoord.st );
 				color0 *= vec4( 1.0 - decay );
 
 				gl_FragColor = color0 + color1;
@@ -52,6 +52,8 @@ namespace flowTools {
 			);
 
 			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+            bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
+            bInitialized *= shader.bindDefaults();
 			bInitialized *= shader.linkProgram();
 
 		}

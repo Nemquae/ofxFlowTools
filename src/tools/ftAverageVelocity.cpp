@@ -9,8 +9,11 @@
 #include "ftAverageVelocity.h"
 
 #if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
-#include "gl32.h"
-#include "gl2ext.h"
+//#include "gl32.h"
+//#include "gl2ext.h"
+#define GL_RGB32F GL_RGB
+#define GL_RG32F GL_RGB
+#define GL_RG GL_RGB
 #endif
 
 namespace flowTools {

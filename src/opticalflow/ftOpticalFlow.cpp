@@ -35,8 +35,9 @@
 #include "ftOpticalFlow.h"
 
 #if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
-#include "gl32.h"
-#include "gl2ext.h"
+#define GL_RGB32F GL_RGB
+//#include "gl32.h"
+//#include "gl2ext.h"
 #endif
 
 namespace flowTools {

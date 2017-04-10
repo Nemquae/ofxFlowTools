@@ -33,8 +33,10 @@
 #include "ftParticleFlow.h"
 
 #if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
-#include "gl32.h"
-#include "gl2ext.h"
+//#include "gl32.h"
+//#include "gl2ext.h"
+#define GL_RG32F GL_RGB
+#define GL_RGBA32F GL_RGBA
 #endif
 
 namespace flowTools {
@@ -157,6 +159,10 @@ namespace flowTools {
 	}
 	
 	void ftParticleFlow::draw(int _x, int _y, int _width, int _height) {
+        std::stringstream ss;
+        ss << "GL Error 12 = " << glGetError() << std::endl;
+        ofLogNotice(ss.str());
+        
 		ofPushView();
 		ofTranslate(_x, _y);
 		ofScale(_width / numParticlesX, _height / numParticlesY);
