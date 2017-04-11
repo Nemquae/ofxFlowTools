@@ -191,9 +191,12 @@ namespace flowTools {
 		
 		void update(ofVboMesh &particleVbo, int _numParticles, ofTexture& _positionTexture, ofTexture& _ALMSTexture, float _twinkleSpeed, ofVec3f _color){
             
+#ifdef DEBUG_GL_ERRORS
             std::stringstream ss;
             ss << "GL Error 13 = " << glGetError() << std::endl;
             ofLogNotice(ss.str());
+#endif // DEBUG_GL_ERRORS
+
             
 			shader.begin();
 			shader.setUniformTexture("PositionTexture", _positionTexture, 0);
@@ -201,9 +204,12 @@ namespace flowTools {
 			shader.setUniform1f("TwinkleSpeed", _twinkleSpeed);
 			shader.setUniform3f("Color", _color);
             
+#ifdef DEBUG_GL_ERRORS
             ss.clear();
             ss << "GL Error 14 = " << glGetError() << std::endl;
             ofLogNotice(ss.str());
+#endif // DEBUG_GL_ERRORS
+
 			
 			bool dinges = true;
 			//glEnable(GL_POINT_SMOOTH);
@@ -213,15 +219,21 @@ namespace flowTools {
             //glEnable(GL_BLEND);
             #endif
             
+#ifdef DEBUG_GL_ERRORS
             ss.clear();
             ss << "GL Error 15a = " << glGetError() << std::endl;
             ofLogNotice(ss.str());
+#endif // DEBUG_GL_ERRORS
+
 			
 			particleVbo.draw();
 
+#ifdef DEBUG_GL_ERRORS
 			ss.clear();
 			ss << "GL Error 15b = " << glGetError() << std::endl;
 			ofLogNotice( ss.str() );
+#endif // DEBUG_GL_ERRORS
+
 			
             #if !((TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS))
 			glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
@@ -230,16 +242,22 @@ namespace flowTools {
             //glDisable(GL_BLEND);
             #endif
 
+#ifdef DEBUG_GL_ERRORS
 			ss.clear();
 			ss << "GL Error 15c = " << glGetError() << std::endl;
 			ofLogNotice( ss.str() );
+#endif // DEBUG_GL_ERRORS
+
 
 			//glDisable(GL_POINT_SMOOTH);
 			shader.end();
             
+#ifdef DEBUG_GL_ERRORS
             ss.clear();
             ss << "GL Error 16 = " << glGetError() << std::endl;
             ofLogNotice(ss.str());
+#endif // DEBUG_GL_ERRORS
+
 			
 		}
 	};
