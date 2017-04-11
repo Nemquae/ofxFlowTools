@@ -33,6 +33,10 @@
 #include "ftDrawForce.h"
 
 #if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
+//
+#endif
+
+#ifndef GL_RGBA32F
 #define GL_RGBA32F GL_RGBA
 #endif
 

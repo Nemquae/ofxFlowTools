@@ -214,16 +214,26 @@ namespace flowTools {
             #endif
             
             ss.clear();
-            ss << "GL Error 15 = " << glGetError() << std::endl;
+            ss << "GL Error 15a = " << glGetError() << std::endl;
             ofLogNotice(ss.str());
 			
 			particleVbo.draw();
+
+			ss.clear();
+			ss << "GL Error 15b = " << glGetError() << std::endl;
+			ofLogNotice( ss.str() );
 			
             #if !((TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS))
 			glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
+
             #else
             //glDisable(GL_BLEND);
             #endif
+
+			ss.clear();
+			ss << "GL Error 15c = " << glGetError() << std::endl;
+			ofLogNotice( ss.str() );
+
 			//glDisable(GL_POINT_SMOOTH);
 			shader.end();
             

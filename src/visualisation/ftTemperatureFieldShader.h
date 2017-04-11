@@ -7,6 +7,9 @@
 #if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
 //#include "gl32.h"
 //#include "gl2ext.h"
+#endif
+
+#ifndef GL_GEOMETRY_SHADER_EXT
 #define GL_GEOMETRY_SHADER_EXT -1
 #endif
 
