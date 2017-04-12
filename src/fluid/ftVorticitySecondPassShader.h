@@ -16,9 +16,11 @@ namespace flowTools {
 
 			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
 
-			if( glslVer == "OpenGL ES GLSL ES 1.00" )
-				glOne();
-			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
+			if( glslVer == "OpenGL ES GLSL ES 1.00" || glslVer == "OpenGL ES GLSL ES 2.00" )
+				glESOne();
+			else if( glslVer == "OpenGL ES GLSL ES 3.00" )
+				glESThree();
+			else if( !ofIsGLProgrammableRenderer() )
 				glTwo();
 			else if( ofIsGLProgrammableRenderer() )
 				glThree();
@@ -30,9 +32,9 @@ namespace flowTools {
 		}
 		
 	protected:
-		void glOne()
+		void glESOne()
 		{
-			fragmentShader = GLSL100(
+			fragmentShader = GLSLES100(
 
 			uniform sampler2D Vorticity;
 			uniform float TimeStep;
@@ -88,6 +90,67 @@ namespace flowTools {
             bInitialized *= shader.bindDefaults();
             bInitialized *= shader.linkProgram();
 
+		}
+
+		void glESThree()
+		{
+			fragmentShader = GLSLES300(
+
+			uniform sampler2DRect Vorticity;
+			uniform float TimeStep;
+			uniform float ConfinementScale;
+			uniform float HalfInverseCellSize;
+
+			in vec2 texCoordVarying;
+			out vec4 fragColor;
+
+			void v2TexNeighbors( sampler2DRect tex, vec2 st,
+								 out vec2 left, out vec2 right, out vec2 bottom, out vec2 top )
+			{
+				left = texture( tex, st - vec2( 1, 0 ) ).xy;
+				right = texture( tex, st + vec2( 1, 0 ) ).xy;
+				bottom = texture( tex, st - vec2( 0, 1 ) ).xy;
+				top = texture( tex, st + vec2( 0, 1 ) ).xy;
+			}
+
+			void fTexNeighbors( sampler2DRect tex, vec2 st,
+								out float left, out float right, out float bottom, out float top )
+			{
+				left = texture( tex, st - vec2( 1, 0 ) ).x;
+				right = texture( tex, st + vec2( 1, 0 ) ).x;
+				bottom = texture( tex, st - vec2( 0, 1 ) ).x;
+				top = texture( tex, st + vec2( 0, 1 ) ).x;
+			}
+
+			void main()
+			{
+
+				vec2 st = texCoordVarying;
+
+				float voL; float voR; float voB; float voT;
+				fTexNeighbors( Vorticity, st, voL, voR, voB, voT );
+				float voC = texture( Vorticity, st ).x;
+
+				vec2 force = HalfInverseCellSize * vec2( abs( voT ) - abs( voB ), abs( voR ) - abs( voL ) );
+
+				// safe normalize
+				const float EPSILON = 2.4414e-4; // 2^-12
+
+				float magSqr = max( EPSILON, dot( force, force ) );
+				force = force * inversesqrt( magSqr );
+
+				force *= ConfinementScale * voC * vec2( 1., -1. );
+				force *= TimeStep;
+
+				fragColor = vec4( force, 0.0, 0.0 );
+			}
+			);
+
+
+			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
+			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+			bInitialized *= shader.bindDefaults();
+			bInitialized *= shader.linkProgram();
 		}
 
 		void glTwo() {

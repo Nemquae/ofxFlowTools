@@ -18,9 +18,11 @@ namespace flowTools {
 
 			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
 
-			if( glslVer == "OpenGL ES GLSL ES 1.00" )
-				glOne();
-			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
+			if( glslVer == "OpenGL ES GLSL ES 1.00" || glslVer == "OpenGL ES GLSL ES 2.00" )
+				glESOne();
+			else if( glslVer == "OpenGL ES GLSL ES 3.00" )
+				glESThree();
+			else if( !ofIsGLProgrammableRenderer() )
 				glTwo();
 			else if( ofIsGLProgrammableRenderer() )
 				glThree();
@@ -32,9 +34,9 @@ namespace flowTools {
 		}
 		
 	protected:
-		void glOne()
+		void glESOne()
 		{
-			fragmentShader = GLSL100(
+			fragmentShader = GLSLES100(
 				uniform vec2		Point;
 			uniform float	Radius;
 			uniform float	EdgeSmooth;
@@ -61,6 +63,42 @@ namespace flowTools {
             bInitialized *= shader.linkProgram();
 
 
+		}
+
+		void glESThree()
+		{
+
+			fragmentShader = GLSLES300(
+
+			uniform vec2	Point;
+			uniform float	Radius;
+			uniform float	EdgeSmooth;
+			uniform vec4	Value;
+			uniform float Invert;
+
+			in vec2 texCoordVarying;
+			out vec4 fragColor;
+
+			void main()
+			{
+				vec4 color = Value;// vec4(abs(Value.x), abs(Value.y), abs(Value.z), Value.w);
+				float d = distance( Point, texCoordVarying );
+				float a = max( ( Radius - d ) / Radius, 0.0 );
+				float c = ceil( a );
+
+				color.w *= pow( a, EdgeSmooth + 0.1 );
+				//color = mix(color, vec4(1.0, 1.0, 1.0, 1.0), 1.0 - color.w)*Invert + color*(1.0-Invert);
+				color.xyz *= c;//= color.xyz*c + vec3(1.0,1.0,1.0)*(1-c)*Invert;// ((1.0 - a) / 10 + 0.9)*c;// mix(color.xyz, vec3(1, 1, 1), 1.0 - a);//= vec3(d, a, c);//= mix(color.xyz, vec3(1, 1, 1), 1.0 - c);
+
+
+				fragColor = color;
+			}
+			);
+
+			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
+			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+			bInitialized *= shader.bindDefaults();
+			bInitialized *= shader.linkProgram();
 		}
 
 		void glTwo() {

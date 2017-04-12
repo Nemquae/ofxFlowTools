@@ -18,9 +18,11 @@ namespace flowTools {
 
 			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
 
-			if( glslVer == "OpenGL ES GLSL ES 1.00" )
-				glOne();
-			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
+			if( glslVer == "OpenGL ES GLSL ES 1.00" || glslVer == "OpenGL ES GLSL ES 2.00" )
+				glESOne();
+			else if( glslVer == "OpenGL ES GLSL ES 3.00" )
+				glESThree();
+			else if( !ofIsGLProgrammableRenderer() )
 				glTwo();
 			else if( ofIsGLProgrammableRenderer() )
 				glThree();
@@ -32,10 +34,10 @@ namespace flowTools {
 		}
 		
 	protected:
-		void glOne()
+		void glESOne()
 		{
 
-			fragmentShader = GLSL100(
+			fragmentShader = GLSLES100(
 
 			uniform sampler2D Backbuffer;
 			uniform sampler2D ALMSTexture;
@@ -82,6 +84,60 @@ namespace flowTools {
             bInitialized *= shader.bindDefaults();
             bInitialized *= shader.linkProgram();
 
+		}
+
+		void glESThree()
+		{
+			fragmentShader = GLSLES300(
+
+			uniform sampler2DRect Backbuffer;
+			uniform sampler2DRect ALMSTexture;
+			uniform sampler2DRect Velocity;
+			uniform sampler2DRect HomeTexture;
+			uniform float TimeStep;
+			uniform float InverseCellSize;
+			uniform vec2	Scale;
+			uniform vec2	Dimensions;
+			uniform vec2	Gravity;
+
+			in vec2 texCoordVarying;
+			out vec4 fragColor;
+
+			void main()
+			{
+				vec2 st = texCoordVarying;
+				vec2 particlePos = texture( Backbuffer, st ).xy;
+
+				vec4 alms = texture( ALMSTexture, st );
+				float age = alms.x;
+				float life = alms.y;
+				float mass = alms.z;
+
+				if( age > 0.0 )
+				{
+					vec2 st2 = particlePos * Scale;
+					vec2 u = texture( Velocity, st2 ).rg / Scale;
+					vec2 coord = TimeStep * InverseCellSize * u;
+
+					particlePos += coord * ( 1.0 / mass ) + Gravity;
+				}
+				else
+				{
+					particlePos = texture( HomeTexture, st ).xy;
+				}
+
+
+				fragColor = vec4( particlePos, 0.0, 1.0 ); ;
+			}
+			);
+
+
+
+
+			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
+			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+			bInitialized *= shader.bindDefaults();
+			bInitialized *= shader.linkProgram();
 		}
 
 		void glTwo() {

@@ -18,9 +18,11 @@ namespace flowTools {
 
 			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
 
-			if( glslVer == "OpenGL ES GLSL ES 1.00" )
-				glOne();
-			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
+			if( glslVer == "OpenGL ES GLSL ES 1.00" || glslVer == "OpenGL ES GLSL ES 2.00" )
+				glESOne();
+			else if( glslVer == "OpenGL ES GLSL ES 3.00" )
+				glESThree();
+			else if( !ofIsGLProgrammableRenderer() )
 				glTwo();
 			else if( ofIsGLProgrammableRenderer() )
 				glThree();
@@ -32,9 +34,9 @@ namespace flowTools {
 		}
 		
 	protected:
-		void glOne()
+		void glESOne()
 		{
-			string fragmentHorizontalBlurShader = GLSL100(
+			string fragmentHorizontalBlurShader = GLSLES100(
 
 			uniform sampler2D backbuffer;
 			uniform float radius;
@@ -69,7 +71,7 @@ namespace flowTools {
             bInitialized *= blurShader[ 0 ].bindDefaults();
 			bInitialized *= blurShader[ 0 ].linkProgram();
 
-			string fragmentVerticalBlurShader = GLSL100(
+			string fragmentVerticalBlurShader = GLSLES100(
                                                         
             uniform sampler2D backbuffer;
 			uniform float radius;
@@ -105,6 +107,81 @@ namespace flowTools {
 			bInitialized *= blurShader[ 1 ].linkProgram();
 
 
+		}
+
+		void glESThree()
+		{
+			string fragmentHorizontalBlurShader = GLSLES300(
+
+			uniform sampler2DRect backbuffer;
+			uniform float radius;
+
+			const float total = ( 1. + 8. + 28. + 56. ) * 2. + 70.;
+
+			in vec2 texCoordVarying;
+			out vec4 fragColor;
+
+			void main( void )
+			{
+				vec2 st = texCoordVarying;
+
+				vec4 color = vec4( 0.0, 0.0, 0.0, 0.0 );
+				color += ( 1. / total ) * texture( backbuffer, st - radius * vec2( 4. / 4., 0. ) );
+				color += ( 8. / total )  * texture( backbuffer, st - radius * vec2( 3. / 4., 0. ) );
+				color += ( 28. / total )  * texture( backbuffer, st - radius * vec2( 2. / 4., 0. ) );
+				color += ( 56. / total )  * texture( backbuffer, st - radius * vec2( 1. / 4., 0. ) );
+
+				color += ( 70. / total ) * texture( backbuffer, st );
+
+				color += ( 1. / total ) * texture( backbuffer, st + radius * vec2( 4. / 4., 0. ) );
+				color += ( 8. / total )  * texture( backbuffer, st + radius * vec2( 3. / 4., 0. ) );
+				color += ( 28. / total )  * texture( backbuffer, st + radius * vec2( 2. / 4., 0. ) );
+				color += ( 56. / total )  * texture( backbuffer, st + radius * vec2( 1. / 4., 0. ) );
+
+				fragColor = color;
+			}
+			);
+			blurShader[ 0 ].unload();
+			bInitialized *= blurShader[ 0 ].setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
+			bInitialized *= blurShader[ 0 ].setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentHorizontalBlurShader );
+			bInitialized *= blurShader[ 0 ].bindDefaults();
+			bInitialized *= blurShader[ 0 ].linkProgram();
+
+			string fragmentVerticalBlurShader = GLSLES300(
+
+			uniform sampler2DRect backbuffer;
+			uniform float radius;
+
+			const float total = ( 1. + 8. + 28. + 56. ) * 2. + 70.;
+
+			in vec2 texCoordVarying;
+			out vec4 fragColor;
+
+			void main( void )
+			{
+				vec2 st = texCoordVarying;
+
+				vec4 color = vec4( 0.0, 0.0, 0.0, 0.0 );
+				color += ( 1. / total ) * texture( backbuffer, st - radius * vec2( 0., 4. / 4. ) );
+				color += ( 8. / total )  * texture( backbuffer, st - radius * vec2( 0., 3. / 4. ) );
+				color += ( 28. / total )  * texture( backbuffer, st - radius * vec2( 0., 2. / 4. ) );
+				color += ( 56. / total )  * texture( backbuffer, st - radius * vec2( 0., 1. / 4. ) );
+
+				color += ( 70. / total ) * texture( backbuffer, st );
+
+				color += ( 1. / total ) * texture( backbuffer, st + radius * vec2( 0., 4. / 4. ) );
+				color += ( 8. / total )  * texture( backbuffer, st + radius * vec2( 0., 3. / 4. ) );
+				color += ( 28. / total )  * texture( backbuffer, st + radius * vec2( 0., 2. / 4. ) );
+				color += ( 56. / total )  * texture( backbuffer, st + radius * vec2( 0., 1. / 4. ) );
+
+				fragColor = color;
+			}
+			);
+			blurShader[ 1 ].unload();
+			bInitialized *= blurShader[ 1 ].setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
+			bInitialized *= blurShader[ 1 ].setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentVerticalBlurShader );
+			bInitialized *= blurShader[ 1 ].bindDefaults();
+			bInitialized *= blurShader[ 1 ].linkProgram();
 		}
 
 		void glTwo() {

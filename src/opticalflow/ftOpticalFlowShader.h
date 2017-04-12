@@ -23,12 +23,14 @@ namespace flowTools {
             //glGetIntegerv(GL_MAJOR_VERSION, &majorVer);
             //glGetIntegerv(GL_MINOR_VERSION, &minorVer);
             
-            if( glslVer == "OpenGL ES GLSL ES 1.00" )//|| (majorVer == 2 && minorVer == 0))
-                glOne();
-            else if( glslVer == "OpenGL ES GLSL ES 2.00" )//|| (majorVer >= 2 && majorVer < 3))
-                glTwo();
-            else if( ofIsGLProgrammableRenderer() )//|| (ofIsGLProgrammableRenderer() && majorVer >= 3))
-                glThree();
+			if( glslVer == "OpenGL ES GLSL ES 1.00" || glslVer == "OpenGL ES GLSL ES 2.00" )
+				glESOne();
+			else if( glslVer == "OpenGL ES GLSL ES 3.00" )
+				glESThree();
+			else if( !ofIsGLProgrammableRenderer() )
+				glTwo();
+			else if( ofIsGLProgrammableRenderer() )
+				glThree();
 
 			if( bInitialized )
 				ofLogNotice( "ftOpticalFlowShader initialized" );
@@ -37,9 +39,9 @@ namespace flowTools {
 		}
 		
 	protected:
-		void glOne()
+		void glESOne()
 		{
-			fragmentShader = GLSL100(
+			fragmentShader = GLSLES100(
             
             uniform sampler2D       CurrTexture;
 			uniform sampler2D       LastTexture;
@@ -107,6 +109,78 @@ namespace flowTools {
             bInitialized *= shader.bindDefaults();
 			bInitialized *= shader.linkProgram();
 
+		}
+
+		void glESThree()
+		{
+
+			fragmentShader = GLSLES300(
+
+			uniform sampler2DRect	CurrTexture;
+			uniform sampler2DRect	LastTexture;
+			uniform float			force;
+			uniform float			offset;
+			uniform float			lambda;
+			uniform float			threshold;
+			uniform float			inverseX;
+			uniform float			inverseY;
+
+			in vec2 texCoordVarying;
+			out vec4 fragColor;
+
+			void main()
+			{
+				vec2 st = texCoordVarying;
+				vec2	off_x = vec2( offset, 0.0 );
+				vec2	off_y = vec2( 0.0, offset );
+
+				//get the difference
+				vec4 scr_dif = texture( CurrTexture, st ) - texture( LastTexture, st );
+
+				//calculate the gradient
+				vec4 gradx; vec4 grady; vec4 gradmag; vec4 vx; vec4 vy;
+				gradx = texture( LastTexture, st + off_x ) - texture( LastTexture, st - off_x );
+				gradx += texture( CurrTexture, st + off_x ) - texture( CurrTexture, st - off_x );
+				grady = texture( LastTexture, st + off_y ) - texture( LastTexture, st - off_y );
+				grady += texture( CurrTexture, st + off_y ) - texture( CurrTexture, st - off_y );
+
+				gradmag = sqrt( ( gradx*gradx ) + ( grady*grady ) + vec4( lambda ) );
+				vx = scr_dif*( gradx / gradmag );
+				vy = scr_dif*( grady / gradmag );
+
+				vec2	flow = vec2( 0.0 );
+				flow.x = -( vx.x + vx.y + vx.z ) / 3.0 * inverseX;
+				flow.y = -( vy.x + vy.y + vy.z ) / 3.0 * inverseY;
+
+				// apply treshold
+				float strength = length( flow );
+				if( strength * threshold > 0.0 )
+				{
+					if( strength < threshold )
+					{
+						flow = vec2( 0.0 );
+					}
+					else
+					{
+						strength = ( strength - threshold ) / ( 1.0 - threshold );
+						flow = normalize( flow ) * vec2( strength );
+
+					}
+				}
+
+				// apply force
+				flow *= vec2( force );
+
+				// set color
+				fragColor = vec4( flow, 0.0, 1.0 );
+			}
+
+			);
+
+			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
+			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+			bInitialized *= shader.bindDefaults();
+			bInitialized *= shader.linkProgram();
 		}
 
 		void glTwo() {
