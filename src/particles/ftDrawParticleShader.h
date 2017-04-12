@@ -207,6 +207,7 @@ namespace flowTools {
 #ifdef DEBUG_GL_ERRORS
             ss.clear();
             ss << "GL Error 14 = " << glGetError() << std::endl;
+            //ss << gluErrorString() << std::endl;
             ofLogNotice(ss.str());
 #endif // DEBUG_GL_ERRORS
 
