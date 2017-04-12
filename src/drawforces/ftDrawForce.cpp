@@ -64,7 +64,11 @@ namespace flowTools {
 		drawType.set(type);
 		isTemporary.set(_isTemporary);
 			
+        #if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
+        forceBuffer.allocate(width, height, GL_RGBA);
+        #else
 		forceBuffer.allocate(width, height, GL_RGBA32F);
+        #endif
 		forceBuffer.black();
 			
 		density = ofFloatColor(1,1,1,1);
