@@ -6,7 +6,7 @@
 #define GLSLES100PI(shader)  "#version 100 \n #define PI 3.1415926535897932 \n #define HALF_PI 1.5707963267948966 \n precision mediump float; \n precision mediump sampler2D; \n" #shader
 #define GLSLES100GEO(shader)  "#version 100 \n #extension GL_EXT_geometry_shader4: enable \n precision mediump float; \n precision mediump sampler2D; \n" #shader
 
-#define GLSLES300(shader)  "#version 300 es \n precision mediump float; \n precision mediump sampler2D; \n" #shader
+#define GLSLES300(shader)  "#version 300 es \n precision mediump float; \n precision mediump sampler2DRect; \n" #shader
 #define GLSLES300PI(shader)  "#version 300 es \n #define PI 3.1415926535897932 \n #define HALF_PI 1.5707963267948966 \n precision mediump float; \n precision mediump sampler2D; \n" #shader
 #define GLSLES300GEO(shader)  "#version 300 es \n #extension GL_EXT_geometry_shader4: enable \n precision mediump float; \n precision mediump sampler2D; \n" #shader
 
