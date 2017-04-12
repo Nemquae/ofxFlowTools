@@ -26,9 +26,11 @@ namespace flowTools {
 
 			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
 
-			if( glslVer == "OpenGL ES GLSL ES 1.00" )
-				glOne();
-			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
+			if( glslVer == "OpenGL ES GLSL ES 1.00" || glslVer == "OpenGL ES GLSL ES 2.00" )
+				glESOne();
+			else if( glslVer == "OpenGL ES GLSL ES 3.00" )
+				glESThree();
+			else if( !ofIsGLProgrammableRenderer() )
 				glTwo();
 			else if( ofIsGLProgrammableRenderer() )
 				glThree();
@@ -40,12 +42,12 @@ namespace flowTools {
 		}
 		
 	protected:
-		void glOne()
+		void glESOne()
 		{
 			string geometryShader;
 
 
-//			vertexShader = GLSL100(
+//			vertexShader = GLSLES100(
 //				void main()
 //			{
 //				gl_Position = gl_Vertex;
@@ -53,16 +55,16 @@ namespace flowTools {
 //			}
 //			);
 //
-//			fragmentShader = GLSL100(
+//			fragmentShader = GLSLES100(
 //				void main()
 //			{
 //				gl_FragColor = gl_Color;
 //			}
 //			);
 
-			geometryShader = GLSL100GEO(
+			geometryShader = GLSLES100GEO(
 
-			uniform sampler2D velocityTexture;
+				uniform sampler2D velocityTexture;
 			uniform sampler2D temperatureTexture;
 			uniform vec2 texResolution;
 			uniform float velocityScale;
@@ -135,10 +137,129 @@ namespace flowTools {
 			shader.setGeometryOutputCount( 5 );
 			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
 			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
-			ofLogWarning("Geometry Shaders not supported by GLSL ES 1.0");
-            //bInitialized *= shader.setupShaderFromSource( GL_GEOMETRY_SHADER_EXT, geometryShader );
+			ofLogWarning( "Geometry Shaders not supported by GLSL ES 1.0" );
+			//bInitialized *= shader.setupShaderFromSource( GL_GEOMETRY_SHADER_EXT, geometryShader );
 			bInitialized *= shader.linkProgram();
 
+		}
+
+		void glESThree()
+		{
+
+			string geometryShader;
+
+			vertexShader = GLSLES300(
+
+			uniform mat4 modelViewProjectionMatrix;
+			uniform mat4 textureMatrix;
+
+			in vec4	position;
+			in vec2	texcoord;
+			in vec4	color;
+
+			out vec2 texCoordVarying;
+			out vec4 colorVarying;
+
+			void main()
+			{
+				colorVarying = color;
+				gl_Position = position;
+			}
+
+			);
+
+			geometryShader = GLSLES300GEO(
+
+			uniform mat4 modelViewProjectionMatrix;
+			uniform sampler2DRect velocityTexture;
+			uniform sampler2DRect temperatureTexture;
+
+			uniform vec2 texResolution;
+			uniform float velocityScale;
+			uniform float temperatureScale;
+			uniform float maxArrowSize;
+
+			layout( points ) in;
+			layout( line_strip ) out;
+			layout( max_vertices = 5 ) out;
+
+			out vec4 colorVarying;
+
+			void main()
+			{
+				vec4 lineStart = gl_in[ 0 ].gl_Position;;
+
+				vec2 uv = lineStart.xy * texResolution;
+				vec2 velocity = texture( velocityTexture, uv ).xy * velocityScale;
+				if( length( velocity ) > maxArrowSize )
+					velocity = normalize( velocity ) * maxArrowSize;
+				vec4 lineEnd = lineStart + vec4( velocity, 0.0, 0.0 );
+
+				float alpha = 0.3 + 0.3 * ( length( velocity ) / maxArrowSize );
+
+				float temperature = texture( temperatureTexture, uv ).x * temperatureScale;
+				float warm = pow( max( 0.0, temperature ), 0.5 );
+				float cold = pow( max( 0.0, -temperature ), 0.5 );
+				float red = 1.0 - cold;
+				float green = 1.0 - cold - warm;
+				float blue = 1.0 - warm;
+
+				vec4 color = vec4( red, green, blue, alpha );
+
+				float arrowLength = 0.75 * length( velocity );
+
+				vec2 nVel = normalize( velocity );
+				float arrowAngleA = atan( nVel.y, nVel.x ) + 0.15;
+				float arrowAngleB = atan( nVel.y, nVel.x ) - 0.15;
+
+				vec4 arrowLineA = vec4( cos( arrowAngleA ), sin( arrowAngleA ), 0., 0. );
+				vec4 arrowLineB = vec4( cos( arrowAngleB ), sin( arrowAngleB ), 0., 0. );
+				arrowLineA = normalize( arrowLineA ) * arrowLength;
+				arrowLineB = normalize( arrowLineB ) * arrowLength;
+				vec4 arrowA = lineStart + arrowLineA;
+				vec4 arrowB = lineStart + arrowLineB;
+
+				gl_Position = modelViewProjectionMatrix * lineStart;
+				colorVarying = color;
+				EmitVertex();
+
+				gl_Position = modelViewProjectionMatrix * lineEnd;
+				colorVarying = color;
+				EmitVertex();
+
+				gl_Position = modelViewProjectionMatrix * arrowA;
+				colorVarying = color;
+				EmitVertex();
+
+				gl_Position = modelViewProjectionMatrix * lineEnd;
+				colorVarying = color;
+				EmitVertex();
+
+				gl_Position = modelViewProjectionMatrix * arrowB;
+				colorVarying = color;
+				EmitVertex();
+
+				EndPrimitive();
+
+			}
+			);
+
+			fragmentShader = GLSLES300(
+
+			in vec4 colorVarying;
+			out vec4 fragColor;
+
+			void main()
+			{
+				fragColor = colorVarying;
+			}
+			);
+
+			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
+			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+			bInitialized *= shader.setupShaderFromSource( GL_GEOMETRY_SHADER_EXT, geometryShader );
+			bInitialized *= shader.bindDefaults();
+			bInitialized *= shader.linkProgram();
 		}
 
 		void glTwo() {

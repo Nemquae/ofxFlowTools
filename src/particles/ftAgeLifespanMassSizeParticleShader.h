@@ -18,9 +18,11 @@ namespace flowTools {
 
 			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
 
-			if( glslVer == "OpenGL ES GLSL ES 1.00" )
-				glOne();
-			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
+			if( glslVer == "OpenGL ES GLSL ES 1.00" || glslVer == "OpenGL ES GLSL ES 2.00" )
+				glESOne();
+			else if( glslVer == "OpenGL ES GLSL ES 3.00" )
+				glESThree();
+			else if( !ofIsGLProgrammableRenderer() )
 				glTwo();
 			else if( ofIsGLProgrammableRenderer() )
 				glThree();
@@ -32,9 +34,9 @@ namespace flowTools {
 		}
 		
 	protected:
-		void glOne()
+		void glESOne()
 		{
-			fragmentShader = GLSL100( 
+			fragmentShader = GLSLES100( 
 				
 			uniform sampler2D Backbuffer;
 			uniform sampler2D Position;
@@ -118,6 +120,93 @@ namespace flowTools {
             bInitialized *= shader.bindDefaults();
             bInitialized *= shader.linkProgram();
 
+		}
+
+		void glESThree()
+		{
+			fragmentShader = GLSLES300( 
+				
+			uniform sampler2DRect Backbuffer;
+			uniform sampler2DRect Position;
+			uniform sampler2DRect Velocity;
+			uniform sampler2DRect Density;
+			uniform sampler2DRect Obstacle;
+			uniform vec2	Scale;
+			uniform float GlobalTime;
+			uniform float DeltaTime;
+			uniform float BirthChance;
+			uniform float BirthVelocityChance;
+			uniform float LifeSpan;
+			uniform float LifeSpanSpread;
+			uniform float Mass;
+			uniform float MassSpread;
+			uniform float Size;
+			uniform float SizeSpread;
+
+			in vec2 texCoordVarying;
+			out vec4 fragColor;
+
+			// hash based 3d value noise
+			float random( float p )
+			{
+				return fract( sin( p )*13420.123 );
+			}
+
+			float noise( vec2 p )
+			{
+				return random( p.x + sin( p.y*112.5345 ) );
+			}
+
+			void main()
+			{
+				vec2 st = texCoordVarying;
+				vec2 st2 = st * Scale;
+
+				vec4 alms = texture( Backbuffer, st );
+				float p_age = alms.x;
+				float p_life = alms.y;
+				float p_mass = alms.z;
+				float p_size = alms.w;
+
+				if( p_age > 0.0 )
+				{
+					p_age += DeltaTime;
+				}
+
+				if( p_age == 0.0 )
+				{
+					float birthRandom = noise( st * GlobalTime + 304.5 ) / BirthChance;
+					float speed = length( texture( Velocity, st2 ).rg / Scale );
+					float birthFromVelocity = speed * BirthVelocityChance;
+					if( birthRandom > 0.001 && birthRandom < birthFromVelocity )
+					{
+						p_age = 0.001;
+						float lifeRandom = noise( st * GlobalTime + 137.34 ) * 2.0 - 1.0;
+						p_life = LifeSpan + LifeSpan * LifeSpanSpread * lifeRandom;
+						float massRandom = noise( st * GlobalTime + 281.05 ) * 2.0 - 1.0;
+						p_mass = Mass + Mass * MassSpread * massRandom;
+						float sizeRandom = noise( st * GlobalTime + 431.93 ) * 2.0 - 1.0;
+						p_size = Size + Size * SizeSpread * sizeRandom;
+					}
+				}
+
+				if( p_age > p_life )
+				{
+					p_age = 0.0;
+				}
+				vec2 particlePos = texture( Position, st ).xy;
+				particlePos *= Scale;
+				float inverseSolid = 1.0 - ceil( texture( Obstacle, particlePos ).x - 0.5 );
+				p_age *= inverseSolid;
+
+				fragColor = vec4( p_age, p_life, p_mass, p_size );
+			}
+			);
+
+			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
+			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+			bInitialized *= shader.bindDefaults();
+			bInitialized *= shader.linkProgram();
 		}
 
 		void glTwo() {

@@ -17,9 +17,11 @@ namespace flowTools {
 
 			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
 
-			if( glslVer == "OpenGL ES GLSL ES 1.00" )
-				glOne();
-			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
+			if( glslVer == "OpenGL ES GLSL ES 1.00" || glslVer == "OpenGL ES GLSL ES 2.00" )
+				glESOne();
+			else if( glslVer == "OpenGL ES GLSL ES 3.00" )
+				glESThree();
+			else if( !ofIsGLProgrammableRenderer() )
 				glTwo();
 			else if( ofIsGLProgrammableRenderer() )
 				glThree();
@@ -31,9 +33,9 @@ namespace flowTools {
 		}
 		
 	protected:
-		void glOne()
+		void glESOne()
 		{
-			fragmentShader = GLSL100(
+			fragmentShader = GLSLES100(
 
 			uniform sampler2D Velocity;
 			uniform sampler2D Temperature;
@@ -68,6 +70,47 @@ namespace flowTools {
             bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
             bInitialized *= shader.bindDefaults();
             bInitialized *= shader.linkProgram();
+		}
+
+		void glESThree()
+		{
+			fragmentShader = GLSLES300(
+
+			uniform sampler2DRect Velocity;
+			uniform sampler2DRect Temperature;
+			uniform sampler2DRect Density;
+
+			uniform float AmbientTemperature;
+			uniform float TimeStep;
+			uniform float Sigma;
+			uniform float Kappa;
+
+			uniform vec2  Gravity;
+
+			in vec2 texCoordVarying;
+			out vec4 fragColor;
+
+			void main()
+			{
+				vec2 st = texCoordVarying;
+
+				float T = texture( Temperature, st ).r;
+				vec2 V = texture( Velocity, st ).rg;
+
+				//   gl_FragColor = vec4(0);
+				//   if (T > AmbientTemperature) {
+				float D = length( texture( Density, st ).rgb );
+				fragColor = vec4( ( TimeStep * ( T - AmbientTemperature ) * Sigma - D * Kappa ) * Gravity, 0.0, 0.0 );
+				//   }
+			}
+
+			);
+
+
+			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
+			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+			bInitialized *= shader.bindDefaults();
+			bInitialized *= shader.linkProgram();
 		}
 
 		void glTwo() {

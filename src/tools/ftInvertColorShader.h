@@ -37,18 +37,20 @@ public:
 		ofLogVerbose( "init ftInvertColorShader" );
 		string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
 
-		if( glslVer == "OpenGL ES GLSL ES 1.00" )
-			glOne();
-		else if( glslVer == "OpenGL ES GLSL ES 2.00" )
+		if( glslVer == "OpenGL ES GLSL ES 1.00" || glslVer == "OpenGL ES GLSL ES 2.00" )
+			glESOne();
+		else if( glslVer == "OpenGL ES GLSL ES 3.00" )
+			glESThree();
+		else if( !ofIsGLProgrammableRenderer() )
 			glTwo();
 		else if( ofIsGLProgrammableRenderer() )
 			glThree();
 	}
 
 protected:
-	void glOne()
+	void glESOne()
 	{
-		fragmentShader = GLSL100(
+		fragmentShader = GLSLES100(
 
 		uniform sampler2D Backbuffer;
 
@@ -85,6 +87,34 @@ protected:
         bInitialized *= shader.bindDefaults();
         bInitialized *= shader.linkProgram();
 
+	}
+
+	void glESThree()
+	{
+		fragmentShader = GLSLES300(
+
+		uniform sampler2DRect Backbuffer;
+
+		in vec2 texCoordVarying;
+		out vec4 fragColor;
+
+		void main()
+		{
+			vec2 st = texCoordVarying;
+
+			vec4 color = texture( Backbuffer, st );
+			color.x = 1.0 - color.x;//max(color.x, 0.0);
+			color.y = 1.0 - color.y;//max(color.y, 0.0);
+			color.z = 1.0 - color.z;// max(color.z, 0.0);
+
+			fragColor = color;
+		}
+		);
+
+		shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
+		shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+		shader.bindDefaults();
+		shader.linkProgram();
 	}
 
 	void glTwo()

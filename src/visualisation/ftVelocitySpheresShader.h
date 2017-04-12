@@ -17,9 +17,11 @@ namespace flowTools {
 
 			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
 
-			if( glslVer == "OpenGL ES GLSL ES 1.00" )
-				glOne();
-			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
+			if( glslVer == "OpenGL ES GLSL ES 1.00" || glslVer == "OpenGL ES GLSL ES 2.00" )
+				glESOne();
+			else if( glslVer == "OpenGL ES GLSL ES 3.00" )
+				glESThree();
+			else if( !ofIsGLProgrammableRenderer() )
 				glTwo();
 			else if( ofIsGLProgrammableRenderer() )
 				glThree();
@@ -31,14 +33,14 @@ namespace flowTools {
 		}
 		
 	protected:
-		void glOne()
+		void glESOne()
 		{
 			string geometryShader;
 
 
 			ofLogWarning( "Velocity Dots not supported for GLSL 100" );
 
-//			vertexShader = GLSL100(
+//			vertexShader = GLSLES100(
 //				void main()
 //			{
 //				gl_Position = gl_Vertex;
@@ -46,7 +48,7 @@ namespace flowTools {
 //			}
 //			);
 //
-//			fragmentShader = GLSL100(
+//			fragmentShader = GLSLES100(
 //				void main()
 //			{
 //				gl_FragColor = gl_Color;
@@ -61,6 +63,70 @@ namespace flowTools {
 			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
 			bInitialized *= shader.linkProgram();
 
+		}
+
+		void glESThree()
+		{
+
+			string geometryShader;
+
+			vertexShader = GLSLES300(
+
+			uniform mat4 modelViewProjectionMatrix;
+			uniform mat4 textureMatrix;
+			uniform sampler2DRect velocityTexture;
+			uniform vec2 texResolution;
+			uniform float displacementScale;
+			uniform float sizeScale;
+			uniform float minDotSize;
+			uniform float maxDotSize;
+
+			in vec4 position;
+			in vec2 texcoord;
+			in vec4 color;
+
+			out vec2 texCoordVarying;
+			out vec4 colorVarying;
+
+
+			void main()
+			{
+				colorVarying = color;
+				texCoordVarying = ( textureMatrix*vec4( texcoord.x, texcoord.y, 0, 1 ) ).xy;
+
+				vec2 st = position.xy * texResolution;
+				vec2 vel = texture( velocityTexture, st ).xy;
+
+				vec2 displacement = vel / vec2( displacementScale, displacementScale );
+				gl_Position = modelViewProjectionMatrix * position + vec4( displacement, 0.0, 1.0 );
+
+				gl_PointSize = max( maxDotSize - ( length( vel ) * sizeScale ), minDotSize );
+			}
+
+			);
+
+			fragmentShader = GLSLES300(
+
+			in vec4 colorVarying;
+			out vec4 fragColor;
+
+			void main()
+			{
+				vec2 p = gl_PointCoord * 2.0 - vec2( 1.0 );
+				float d = dot( p, p );
+				float r = sqrt( d );
+
+				if( d > r )
+					discard;
+				else
+					fragColor = colorVarying * vec4( 1.0, 1.0, 1.0, 1.0 - pow( r, 8.5 ) ); // power is for gradient edge
+			}
+			);
+
+			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
+			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+			bInitialized *= shader.bindDefaults();
+			bInitialized *= shader.linkProgram();
 		}
 
 		void glTwo() {

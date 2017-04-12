@@ -18,9 +18,11 @@ namespace flowTools {
 
 			string glslVer = (char *)glGetString( GL_SHADING_LANGUAGE_VERSION );
 
-			if( glslVer == "OpenGL ES GLSL ES 1.00" )
-				glOne();
-			else if( glslVer == "OpenGL ES GLSL ES 2.00" )
+			if( glslVer == "OpenGL ES GLSL ES 1.00" || glslVer == "OpenGL ES GLSL ES 2.00" )
+				glESOne();
+			else if( glslVer == "OpenGL ES GLSL ES 3.00" )
+				glESThree();
+			else if( !ofIsGLProgrammableRenderer() )
 				glTwo();
 			else if( ofIsGLProgrammableRenderer() )
 				glThree();
@@ -32,9 +34,9 @@ namespace flowTools {
 		}
 		
 	protected:
-		void glOne()
+		void glESOne()
 		{
-			fragmentShader = GLSL100(
+			fragmentShader = GLSLES100(
 
 			uniform sampler2D RedTexture;
 			uniform vec2	Scale;
@@ -56,6 +58,32 @@ namespace flowTools {
             bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
             bInitialized *= shader.bindDefaults();
             bInitialized *= shader.linkProgram();
+		}
+
+		void glESThree()
+		{
+			fragmentShader = GLSLES300(
+
+			uniform sampler2DRect RedTexture;
+			uniform vec2	Scale;
+
+			in vec2 texCoordVarying;
+			out vec4 fragColor;
+
+			void main()
+			{
+				vec2 st = texCoordVarying;
+				vec2 st2 = st * Scale;
+
+				vec4 color = texture( RedTexture, st );
+				fragColor = vec4( color.x, color.x, color.x, 1.0 );
+			}
+			);
+
+			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
+			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
+			bInitialized *= shader.bindDefaults();
+			bInitialized *= shader.linkProgram();
 		}
 
 		void glTwo() {
