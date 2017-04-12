@@ -74,35 +74,35 @@ namespace flowTools {
 
 		void glESThree()
 		{
-			fragmentShader = GLSLES300(
+			fragmentShader = GLSLES300
+			(
+				uniform sampler2D Velocity;
+				uniform sampler2D Temperature;
+				uniform sampler2D Density;
 
-			uniform sampler2DRect Velocity;
-			uniform sampler2DRect Temperature;
-			uniform sampler2DRect Density;
+				uniform float AmbientTemperature;
+				uniform float TimeStep;
+				uniform float Sigma;
+				uniform float Kappa;
 
-			uniform float AmbientTemperature;
-			uniform float TimeStep;
-			uniform float Sigma;
-			uniform float Kappa;
+				uniform vec2  Gravity;
 
-			uniform vec2  Gravity;
+				in vec2 texCoordVarying;
+				out vec4 fragColor;
 
-			in vec2 texCoordVarying;
-			out vec4 fragColor;
+				void main()
+				{
+					vec2 st = texCoordVarying;
 
-			void main()
-			{
-				vec2 st = texCoordVarying;
+					float T = texture( Temperature, st ).r;
+					vec2 V = texture( Velocity, st ).rg;
 
-				float T = texture( Temperature, st ).r;
-				vec2 V = texture( Velocity, st ).rg;
-
-				//   gl_FragColor = vec4(0);
-				//   if (T > AmbientTemperature) {
-				float D = length( texture( Density, st ).rgb );
-				fragColor = vec4( ( TimeStep * ( T - AmbientTemperature ) * Sigma - D * Kappa ) * Gravity, 0.0, 0.0 );
-				//   }
-			}
+					//   gl_FragColor = vec4(0);
+					//   if (T > AmbientTemperature) {
+					float D = length( texture( Density, st ).rgb );
+					fragColor = vec4( ( TimeStep * ( T - AmbientTemperature ) * Sigma - D * Kappa ) * Gravity, 0.0, 0.0 );
+					//   }
+				}
 
 			);
 

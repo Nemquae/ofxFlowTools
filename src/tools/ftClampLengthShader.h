@@ -68,29 +68,29 @@ namespace flowTools {
 
 		void glESThree()
 		{
-			fragmentShader = GLSLES300(
+			fragmentShader = GLSLES300
+			(
+				uniform sampler2D Backbuffer;
+				uniform float MaxLength;
+				uniform float ClampForce;
 
-			uniform sampler2DRect Backbuffer;
-			uniform float MaxLength;
-			uniform float ClampForce;
+				in vec2 texCoordVarying;
+				out vec4 fragColor;
 
-			in vec2 texCoordVarying;
-			out vec4 fragColor;
-
-			void main()
-			{
-				vec2 st = texCoordVarying;
-
-				vec4 color = texture( Backbuffer, st );
-
-				float l = length( color.xyz );
-				if( l > MaxLength )
+				void main()
 				{
-					float dinges = ( l - MaxLength ) * ClampForce;
-					color.xyz = normalize( color.xyz ) * ( l - dinges );
+					vec2 st = texCoordVarying;
+
+					vec4 color = texture( Backbuffer, st );
+
+					float l = length( color.xyz );
+					if( l > MaxLength )
+					{
+						float dinges = ( l - MaxLength ) * ClampForce;
+						color.xyz = normalize( color.xyz ) * ( l - dinges );
+					}
+					fragColor = color;
 				}
-				fragColor = color;
-			}
 			);
 
 			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );

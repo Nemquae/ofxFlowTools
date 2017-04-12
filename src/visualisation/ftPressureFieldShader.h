@@ -132,99 +132,98 @@ namespace flowTools {
 		{
 			string geometryShader;
 
-			vertexShader = GLSLES300(
+			vertexShader = GLSLES300
+			(
+				uniform mat4 modelViewProjectionMatrix;
+				uniform mat4 textureMatrix;
 
-			uniform mat4 modelViewProjectionMatrix;
-			uniform mat4 textureMatrix;
+				in vec4 position;
+				in vec2	texcoord;
+				in vec4	color;
 
-			in vec4 position;
-			in vec2	texcoord;
-			in vec4	color;
+				out vec2 texCoordVarying;
+				out vec4 colorVarying;
 
-			out vec2 texCoordVarying;
-			out vec4 colorVarying;
-
-			void main()
-			{
-				colorVarying = color;
-				gl_Position = position;
-			}
-
+				void main()
+				{
+					colorVarying = color;
+					gl_Position = position;
+				}
 			);
 
-			geometryShader = GLSLES300GEO(
+			geometryShader = GLSLES300GEO
+			(
+				uniform mat4 modelViewProjectionMatrix;
+				uniform sampler2D pressureTexture;
+				uniform vec2 texResolution;
+				uniform float pressureScale;
+				uniform float maxRadius;
 
-			uniform mat4 modelViewProjectionMatrix;
-			uniform sampler2DRect pressureTexture;
-			uniform vec2 texResolution;
-			uniform float pressureScale;
-			uniform float maxRadius;
+				layout( points ) in;
+				layout( line_strip ) out;
+				layout( max_vertices = 5 ) out;
 
-			layout( points ) in;
-			layout( line_strip ) out;
-			layout( max_vertices = 5 ) out;
+				out vec4 colorVarying;
 
-			out vec4 colorVarying;
+				void main()
+				{
 
-			void main()
-			{
+					vec4 centre = gl_in[ 0 ].gl_Position;
+					vec2 uv = centre.xy * texResolution;
 
-				vec4 centre = gl_in[ 0 ].gl_Position;
-				vec2 uv = centre.xy * texResolution;
+					float pressure = texture( pressureTexture, uv ).x * pressureScale;
+					pressure = min( pressure, maxRadius );
+					pressure = max( pressure, -maxRadius );
+					float aspectRatio = texResolution.x / texResolution.y;
 
-				float pressure = texture( pressureTexture, uv ).x * pressureScale;
-				pressure = min( pressure, maxRadius );
-				pressure = max( pressure, -maxRadius );
-				float aspectRatio = texResolution.x / texResolution.y;
+					vec4 north = centre + vec4( pressure, 0, 0, 0 );
+					vec4 east = centre + vec4( 0, pressure * aspectRatio, 0, 0 );
+					vec4 south = centre + vec4( -pressure, 0, 0, 0 );
+					vec4 west = centre + vec4( 0, -pressure * aspectRatio, 0, 0 );
 
-				vec4 north = centre + vec4( pressure, 0, 0, 0 );
-				vec4 east = centre + vec4( 0, pressure * aspectRatio, 0, 0 );
-				vec4 south = centre + vec4( -pressure, 0, 0, 0 );
-				vec4 west = centre + vec4( 0, -pressure * aspectRatio, 0, 0 );
+					float normalizedPressure = pressure / maxRadius;
+					float highPressure = pow( max( 0.0, normalizedPressure ), 0.5 );
+					float lowPressure = pow( max( 0.0, -normalizedPressure ), 0.5 );
+					float red = 1.0 - lowPressure;
+					float green = 1.0;// - lowPressure - highPressure;
+					float blue = 1.0 - highPressure;
+					float alpha = 0.3 + 0.3 * ( abs( normalizedPressure ) );
 
-				float normalizedPressure = pressure / maxRadius;
-				float highPressure = pow( max( 0.0, normalizedPressure ), 0.5 );
-				float lowPressure = pow( max( 0.0, -normalizedPressure ), 0.5 );
-				float red = 1.0 - lowPressure;
-				float green = 1.0;// - lowPressure - highPressure;
-				float blue = 1.0 - highPressure;
-				float alpha = 0.3 + 0.3 * ( abs( normalizedPressure ) );
+					vec4 color = vec4( red, green, blue, alpha );
 
-				vec4 color = vec4( red, green, blue, alpha );
+					gl_Position = modelViewProjectionMatrix * north;
+					colorVarying = color;
+					EmitVertex();
 
-				gl_Position = modelViewProjectionMatrix * north;
-				colorVarying = color;
-				EmitVertex();
+					gl_Position = modelViewProjectionMatrix * east;
+					colorVarying = color;
+					EmitVertex();
 
-				gl_Position = modelViewProjectionMatrix * east;
-				colorVarying = color;
-				EmitVertex();
+					gl_Position = modelViewProjectionMatrix * south;
+					colorVarying = color;
+					EmitVertex();
 
-				gl_Position = modelViewProjectionMatrix * south;
-				colorVarying = color;
-				EmitVertex();
+					gl_Position = modelViewProjectionMatrix * west;
+					colorVarying = color;
+					EmitVertex();
 
-				gl_Position = modelViewProjectionMatrix * west;
-				colorVarying = color;
-				EmitVertex();
+					gl_Position = modelViewProjectionMatrix * north;
+					colorVarying = color;
+					EmitVertex();
 
-				gl_Position = modelViewProjectionMatrix * north;
-				colorVarying = color;
-				EmitVertex();
-
-				EndPrimitive();
-			}
+					EndPrimitive();
+				}
 			);
 
-			fragmentShader = GLSLES300(
+			fragmentShader = GLSLES300
+			(
+				in vec4 colorVarying;
+				out vec4 fragColor;
 
-			in vec4 colorVarying;
-			out vec4 fragColor;
-
-			void main()
-			{
-				fragColor = colorVarying;
-			}
+				void main()
+				{
+					fragColor = colorVarying;
+				}
 			);
 
 			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );

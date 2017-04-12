@@ -68,34 +68,34 @@ namespace flowTools {
 
 		void glESThree()
 		{
-			vertexShader = GLSLES300(
+			vertexShader = GLSLES300
+			(
+				uniform mat4 modelViewProjectionMatrix;
+				uniform mat4 textureMatrix;
 
-			uniform mat4 modelViewProjectionMatrix;
-			uniform mat4 textureMatrix;
+				in vec4	position;
+				in vec2	texcoord;
+				in vec4	color;
 
-			in vec4	position;
-			in vec2	texcoord;
-			in vec4	color;
+				out vec2 texCoordVarying;
+				out vec4 colorVarying;
 
-			out vec2 texCoordVarying;
-			out vec4 colorVarying;
-
-			void main()
-			{
-				colorVarying = color;
-				texCoordVarying = ( textureMatrix*vec4( texcoord.x, texcoord.y, 0, 1 ) ).xy;
-				gl_Position = modelViewProjectionMatrix * position;
-			}
+				void main()
+				{
+					colorVarying = color;
+					texCoordVarying = ( textureMatrix*vec4( texcoord.x, texcoord.y, 0, 1 ) ).xy;
+					gl_Position = modelViewProjectionMatrix * position;
+				}
 			);
 
-			fragmentShader = GLSLES300(
+			fragmentShader = GLSLES300
+			(
+				out vec4 fragColor;
 
-			out vec4 fragColor;
-
-			void main()
-			{
-				fragColor = vec4( 0.0, 1.0, 0.0, 1.0 );
-			}
+				void main()
+				{
+					fragColor = vec4( 0.0, 1.0, 0.0, 1.0 );
+				}
 			);
 		}
         

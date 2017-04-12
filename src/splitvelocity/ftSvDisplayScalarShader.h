@@ -68,29 +68,29 @@ namespace flowTools {
 		void glESThree()
 		{
 
-			fragmentShader = GLSLES300(
+			fragmentShader = GLSLES300
+			(
+				uniform sampler2D FloatTexture;
+				uniform float Scale;
 
-			uniform sampler2DRect FloatTexture;
-			uniform float Scale;
+				in vec2 texCoordVarying;
+				out vec4 fragColor;
 
-			in vec2 texCoordVarying;
-			out vec4 fragColor;
+				void main()
+				{
+					vec2 st = texCoordVarying;
+					vec4	velocity = texture( FloatTexture, st );
 
-			void main()
-			{
-				vec2 st = texCoordVarying;
-				vec4	velocity = texture( FloatTexture, st );
+					vec3 cLeft = vec3( velocity.x ) * vec3( 0.75, 0.00, 0.00 ); // red
+					vec3 cDown = vec3( velocity.y ) * vec3( 0.75, 0.09, 0.00 ); // blue
+					vec3 cRight = vec3( velocity.z ) * vec3( 0.00, 0.75, 0.17 ); // green
+					vec3 cUp = vec3( velocity.w ) * vec3( 0.75, 0.59, 0.00 ); // ocre
 
-				vec3 cLeft = vec3( velocity.x ) * vec3( 0.75, 0.00, 0.00 ); // red
-				vec3 cDown = vec3( velocity.y ) * vec3( 0.75, 0.09, 0.00 ); // blue
-				vec3 cRight = vec3( velocity.z ) * vec3( 0.00, 0.75, 0.17 ); // green
-				vec3 cUp = vec3( velocity.w ) * vec3( 0.75, 0.59, 0.00 ); // ocre
+					vec3 color = cLeft + cDown + cRight + cUp;
+					color *= vec3( Scale );
 
-				vec3 color = cLeft + cDown + cRight + cUp;
-				color *= vec3( Scale );
-
-				fragColor = vec4( color, 1.0 );
-			}
+					fragColor = vec4( color, 1.0 );
+				}
 			);
 
 			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );

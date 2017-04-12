@@ -68,31 +68,31 @@ namespace flowTools {
 		void glESThree()
 		{
 
-			fragmentShader = GLSLES300(
+			fragmentShader = GLSLES300
+			(
+				uniform vec2	Point;
+				uniform float	Radius;
+				uniform float	EdgeSmooth;
+				uniform vec4	Value;
+				uniform float Invert;
 
-			uniform vec2	Point;
-			uniform float	Radius;
-			uniform float	EdgeSmooth;
-			uniform vec4	Value;
-			uniform float Invert;
+				in vec2 texCoordVarying;
+				out vec4 fragColor;
 
-			in vec2 texCoordVarying;
-			out vec4 fragColor;
+				void main()
+				{
+					vec4 color = Value;// vec4(abs(Value.x), abs(Value.y), abs(Value.z), Value.w);
+					float d = distance( Point, texCoordVarying );
+					float a = max( ( Radius - d ) / Radius, 0.0 );
+					float c = ceil( a );
 
-			void main()
-			{
-				vec4 color = Value;// vec4(abs(Value.x), abs(Value.y), abs(Value.z), Value.w);
-				float d = distance( Point, texCoordVarying );
-				float a = max( ( Radius - d ) / Radius, 0.0 );
-				float c = ceil( a );
-
-				color.w *= pow( a, EdgeSmooth + 0.1 );
-				//color = mix(color, vec4(1.0, 1.0, 1.0, 1.0), 1.0 - color.w)*Invert + color*(1.0-Invert);
-				color.xyz *= c;//= color.xyz*c + vec3(1.0,1.0,1.0)*(1-c)*Invert;// ((1.0 - a) / 10 + 0.9)*c;// mix(color.xyz, vec3(1, 1, 1), 1.0 - a);//= vec3(d, a, c);//= mix(color.xyz, vec3(1, 1, 1), 1.0 - c);
+					color.w *= pow( a, EdgeSmooth + 0.1 );
+					//color = mix(color, vec4(1.0, 1.0, 1.0, 1.0), 1.0 - color.w)*Invert + color*(1.0-Invert);
+					color.xyz *= c;//= color.xyz*c + vec3(1.0,1.0,1.0)*(1-c)*Invert;// ((1.0 - a) / 10 + 0.9)*c;// mix(color.xyz, vec3(1, 1, 1), 1.0 - a);//= vec3(d, a, c);//= mix(color.xyz, vec3(1, 1, 1), 1.0 - c);
 
 
-				fragColor = color;
-			}
+					fragColor = color;
+				}
 			);
 
 			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );

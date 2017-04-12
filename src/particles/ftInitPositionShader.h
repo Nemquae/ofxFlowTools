@@ -60,20 +60,20 @@ namespace flowTools {
 		void glESThree()
 		{
 
-			fragmentShader = GLSLES100(
+			fragmentShader = GLSLES100
+			(
+				uniform vec2 Dimensions;
 
-			uniform vec2 Dimensions;
+				in vec2 texCoordVarying;
+				out vec4 fragColor;
 
-			in vec2 texCoordVarying;
-			out vec4 fragColor;
+				void main()
+				{
+					vec2 st = texCoordVarying;
 
-			void main()
-			{
-				vec2 st = texCoordVarying;
+					fragColor = vec4( st, 0.0, 1.0 );
 
-				fragColor = vec4( st, 0.0, 1.0 );
-
-			}
+				}
 			);
 
 			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );

@@ -62,27 +62,27 @@ namespace flowTools {
 
 		void glESThree()
 		{
-			fragmentShader = GLSLES300(
+			fragmentShader = GLSLES300
+			(
+				uniform sampler2D Backbuffer;
+				uniform sampler2D AddTexture;
+				uniform float force;
+				uniform vec2	Scale;
 
-			uniform sampler2DRect Backbuffer;
-			uniform sampler2DRect AddTexture;
-			uniform float force;
-			uniform vec2	Scale;
+				in vec2 texCoordVarying;
+				out vec4 fragColor;
 
-			in vec2 texCoordVarying;
-			out vec4 fragColor;
+				void main()
+				{
+					vec2 st = texCoordVarying;
+					vec2 st2 = st * Scale;
 
-			void main()
-			{
-				vec2 st = texCoordVarying;
-				vec2 st2 = st * Scale;
+					vec4 color = texture( Backbuffer, st );
+					float multiplier = length( texture( AddTexture, st2 ).xy ) * force;
+					color.xyz *= 1.0 - min( multiplier, 0.9 );
 
-				vec4 color = texture( Backbuffer, st );
-				float multiplier = length( texture( AddTexture, st2 ).xy ) * force;
-				color.xyz *= 1.0 - min( multiplier, 0.9 );
-
-				fragColor = color;
-			}
+					fragColor = color;
+				}
 			);
 
 

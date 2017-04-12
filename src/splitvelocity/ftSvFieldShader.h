@@ -113,77 +113,80 @@ namespace flowTools {
 
 			string geometryShader;
 
-			vertexShader = GLSLES300(
+			vertexShader = GLSLES300
+			(
 
-			uniform mat4 modelViewProjectionMatrix;
-			uniform mat4 textureMatrix;
+				uniform mat4 modelViewProjectionMatrix;
+				uniform mat4 textureMatrix;
 
-			in vec4 position;
-			in vec2	texcoord;
-			in vec4	color;
+				in vec4 position;
+				in vec2	texcoord;
+				in vec4	color;
 
-			out vec2 texCoordVarying;
-			out vec4 colorVarying;
+				out vec2 texCoordVarying;
+				out vec4 colorVarying;
 
-			void main()
-			{
-				colorVarying = color;
-				gl_Position = position;
-			}
+				void main()
+				{
+					colorVarying = color;
+					gl_Position = position;
+				}
 
 			);
 
-			geometryShader = GLSLES300GEO(
+			geometryShader = GLSLES300GEO
+			(
 
-			uniform mat4 modelViewProjectionMatrix;
-			uniform sampler2DRect fieldTexture;
-			uniform vec2 texResolution;
-			uniform vec4 baseColor;
-			uniform float vectorSize;
-			uniform float maxArrowSize;
+				uniform mat4 modelViewProjectionMatrix;
+				uniform sampler2D fieldTexture;
+				uniform vec2 texResolution;
+				uniform vec4 baseColor;
+				uniform float vectorSize;
+				uniform float maxArrowSize;
 
-			layout( points ) in;
-			layout( line_strip ) out;
-			layout( max_vertices = 5 ) out;
+				layout( points ) in;
+				layout( line_strip ) out;
+				layout( max_vertices = 5 ) out;
 
-			void main()
-			{
-				vec4 lineStart = gl_in[ 0 ].gl_Position;
-				vec2 uv = lineStart.xy * texResolution;
+				void main()
+				{
+					vec4 lineStart = gl_in[ 0 ].gl_Position;
+					vec2 uv = lineStart.xy * texResolution;
 
-				vec4 splitVelocity = texture( fieldTexture, uv ) * vectorSize;
+					vec4 splitVelocity = texture( fieldTexture, uv ) * vectorSize;
 
-				vec2 pVel = splitVelocity.xy;
-				if( length( pVel ) > maxArrowSize )
-					pVel = normalize( pVel ) * maxArrowSize;
-				vec2 nVel = splitVelocity.zw;
-				if( length( nVel ) > maxArrowSize )
-					nVel = normalize( nVel ) * maxArrowSize;
+					vec2 pVel = splitVelocity.xy;
+					if( length( pVel ) > maxArrowSize )
+						pVel = normalize( pVel ) * maxArrowSize;
+					vec2 nVel = splitVelocity.zw;
+					if( length( nVel ) > maxArrowSize )
+						nVel = normalize( nVel ) * maxArrowSize;
 
-				gl_Position = gl_ModelViewProjectionMatrix * ( lineStart + vec4( pVel, 0, 0 ) );
-				//	 gl_FrontColor = vec4(normalize(pVel),0,1);
-				EmitVertex();
+					gl_Position = gl_ModelViewProjectionMatrix * ( lineStart + vec4( pVel, 0, 0 ) );
+					//	 gl_FrontColor = vec4(normalize(pVel),0,1);
+					EmitVertex();
 
-				gl_Position = gl_ModelViewProjectionMatrix * lineStart;
-				//	 gl_FrontColor = vec4(0,0,0,.2);
-				EmitVertex();
+					gl_Position = gl_ModelViewProjectionMatrix * lineStart;
+					//	 gl_FrontColor = vec4(0,0,0,.2);
+					EmitVertex();
 
-				gl_Position = gl_ModelViewProjectionMatrix * ( lineStart - vec4( nVel, 0, 0 ) );
-				//	 gl_FrontColor = vec4(0,normalize(nVel),1);
-				EmitVertex();
+					gl_Position = gl_ModelViewProjectionMatrix * ( lineStart - vec4( nVel, 0, 0 ) );
+					//	 gl_FrontColor = vec4(0,normalize(nVel),1);
+					EmitVertex();
 
-				EndPrimitive();
-			}
+					EndPrimitive();
+				}
 			);
 
-			fragmentShader = GLSLES300(
+			fragmentShader = GLSLES300
+			(
 
-			out vec4 fragColor;
+				out vec4 fragColor;
 
-			void main()
-			{
-				fragColor = vec4( 1.0, 1.0, 1.0, 1.0 );
-			}
+				void main()
+				{
+					fragColor = vec4( 1.0, 1.0, 1.0, 1.0 );
+				}
 			);
 
 			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );

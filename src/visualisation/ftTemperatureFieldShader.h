@@ -116,94 +116,94 @@ namespace flowTools {
 		{
 			string geometryShader;
 
-			vertexShader = GLSLES300(
+			vertexShader = GLSLES300
+			(
+				uniform mat4 modelViewProjectionMatrix;
+				uniform mat4 textureMatrix;
 
-			uniform mat4 modelViewProjectionMatrix;
-			uniform mat4 textureMatrix;
+				in vec4 position;
+				in vec2	texcoord;
+				in vec4	color;
 
-			in vec4 position;
-			in vec2	texcoord;
-			in vec4	color;
+				out vec2 texCoordVarying;
+				out vec4 colorVarying;
 
-			out vec2 texCoordVarying;
-			out vec4 colorVarying;
-
-			void main()
-			{
-				colorVarying = color;
-				gl_Position = position;
-			}
+				void main()
+				{
+					colorVarying = color;
+					gl_Position = position;
+				}
 
 			);
 
-			geometryShader = GLSLES300GEO(
+			geometryShader = GLSLES300GEO
+			(
+				uniform mat4 modelViewProjectionMatrix;
+				uniform sampler2D temperatureTexture;
+				uniform vec2 texResolution;
+				uniform float temperatureScale;
+				uniform float maxHeight;
+				uniform float lineWidth;
 
-			uniform mat4 modelViewProjectionMatrix;
-			uniform sampler2DRect temperatureTexture;
-			uniform vec2 texResolution;
-			uniform float temperatureScale;
-			uniform float maxHeight;
-			uniform float lineWidth;
+				layout( points ) in;
+				layout( triangle_strip ) out;
+				layout( max_vertices = 4 ) out;
 
-			layout( points ) in;
-			layout( triangle_strip ) out;
-			layout( max_vertices = 4 ) out;
+				out vec4 colorVarying;
 
-			out vec4 colorVarying;
+				void main()
+				{
 
-			void main()
-			{
+					vec4 lineStart = gl_in[ 0 ].gl_Position;
+					vec2 uv = lineStart.xy * texResolution;
 
-				vec4 lineStart = gl_in[ 0 ].gl_Position;
-				vec2 uv = lineStart.xy * texResolution;
+					float temperature = texture( temperatureTexture, uv ).x * temperatureScale;
+					temperature = min( temperature, maxHeight );
+					temperature = max( temperature, -maxHeight );
 
-				float temperature = texture( temperatureTexture, uv ).x * temperatureScale;
-				temperature = min( temperature, maxHeight );
-				temperature = max( temperature, -maxHeight );
+					vec4 lineEnd = lineStart + vec4( 0.0, -temperature, 0.0, 0.0 );
 
-				vec4 lineEnd = lineStart + vec4( 0.0, -temperature, 0.0, 0.0 );
+					float alpha = 0.5 + 0.5 * ( abs( temperature ) / maxHeight );
+					float red = max( 0.0, temperature * 1000. );
+					float blue = max( 0.0, -temperature * 1000. );
+					vec4 color = vec4( red, 0.0, blue, alpha );
 
-				float alpha = 0.5 + 0.5 * ( abs( temperature ) / maxHeight );
-				float red = max( 0.0, temperature * 1000. );
-				float blue = max( 0.0, -temperature * 1000. );
-				vec4 color = vec4( red, 0.0, blue, alpha );
+					float arrowLength = 0.75 * temperature;
 
-				float arrowLength = 0.75 * temperature;
-
-				lineStart.x -= lineWidth * 0.5;
-				gl_Position = modelViewProjectionMatrix * lineStart;
-				colorVarying = vec4( 1.0, 1.0, 1.0, 0.0 );
-				EmitVertex();
+					lineStart.x -= lineWidth * 0.5;
+					gl_Position = modelViewProjectionMatrix * lineStart;
+					colorVarying = vec4( 1.0, 1.0, 1.0, 0.0 );
+					EmitVertex();
 
 
-				lineStart.x += lineWidth;
-				gl_Position = modelViewProjectionMatrix * lineStart;
-				colorVarying = vec4( 1.0, 1.0, 1.0, 0.0 );
-				EmitVertex();
+					lineStart.x += lineWidth;
+					gl_Position = modelViewProjectionMatrix * lineStart;
+					colorVarying = vec4( 1.0, 1.0, 1.0, 0.0 );
+					EmitVertex();
 
-				lineEnd.x -= lineWidth * 0.5;
-				gl_Position = modelViewProjectionMatrix * lineEnd;
-				colorVarying = color;
-				EmitVertex();
+					lineEnd.x -= lineWidth * 0.5;
+					gl_Position = modelViewProjectionMatrix * lineEnd;
+					colorVarying = color;
+					EmitVertex();
 
-				lineEnd.x += lineWidth;
-				gl_Position = modelViewProjectionMatrix * lineEnd;
-				colorVarying = color;
-				EmitVertex();
+					lineEnd.x += lineWidth;
+					gl_Position = modelViewProjectionMatrix * lineEnd;
+					colorVarying = color;
+					EmitVertex();
 
-				EndPrimitive();
-			}
+					EndPrimitive();
+				}
 			);
 
-			fragmentShader = GLSLES300(
+			fragmentShader = GLSLES300
+			(
+				in vec4 colorVarying;
+				out vec4 fragColor;
 
-			in vec4 colorVarying;
-			out vec4 fragColor;
-
-			void main()
-			{
-				fragColor = colorVarying;
-			}
+				void main()
+				{
+					fragColor = colorVarying;
+				}
 			);
 
 			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );

@@ -77,27 +77,27 @@ protected:
 
 	void glESThree()
 	{
-		fragmentShader = GLSLES300(
+		fragmentShader = GLSLES300
+		(
+			uniform sampler2D Backbuffer;
+			uniform vec4 MixColor;
 
-		uniform sampler2DRect Backbuffer;
-		uniform vec4 MixColor;
+			in vec2 texCoordVarying;
+			out vec4 fragColor;
 
-		in vec2 texCoordVarying;
-		out vec4 fragColor;
+			void main()
+			{
+				vec2 st = texCoordVarying;
 
-		void main()
-		{
-			vec2 st = texCoordVarying;
+				vec4 color = texture( Backbuffer, st );
+				float a = color.w;// ceil(color.w);
 
-			vec4 color = texture( Backbuffer, st );
-			float a = color.w;// ceil(color.w);
+								  //color = color*a + vec4(1.0, 1.0, 1.0, 0.0)*(1.0-a);
+				color = mix( color, MixColor, 1.0 - a );
+				//color.y = color.w;
 
-							  //color = color*a + vec4(1.0, 1.0, 1.0, 0.0)*(1.0-a);
-			color = mix( color, MixColor, 1.0 - a );
-			//color.y = color.w;
-
-			fragColor = color;
-		}
+				fragColor = color;
+			}
 		);
 
 		shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );

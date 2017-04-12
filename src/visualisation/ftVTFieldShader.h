@@ -62,73 +62,73 @@ namespace flowTools {
 //			}
 //			);
 
-			geometryShader = GLSLES100GEO(
-
+			geometryShader = GLSLES100GEO
+			(
 				uniform sampler2D velocityTexture;
-			uniform sampler2D temperatureTexture;
-			uniform vec2 texResolution;
-			uniform float velocityScale;
-			uniform float temperatureScale;
-			uniform float maxArrowSize;
+				uniform sampler2D temperatureTexture;
+				uniform vec2 texResolution;
+				uniform float velocityScale;
+				uniform float temperatureScale;
+				uniform float maxArrowSize;
 
-			varying vec4	posCoord;
+				varying vec4	posCoord;
 
-			void main()
-			{
+				void main()
+				{
 
-				vec4 lineStart = gl_PositionIn[ 0 ];
-				vec2 uv = lineStart.xy * texResolution;
-				vec2 velocity = texture2D( velocityTexture, uv ).xy * velocityScale;
-				if( length( velocity ) > maxArrowSize )
-					velocity = normalize( velocity ) * maxArrowSize;
-				vec4 lineEnd = lineStart + vec4( velocity, 0.0, 0.0 );
+					vec4 lineStart = gl_PositionIn[ 0 ];
+					vec2 uv = lineStart.xy * texResolution;
+					vec2 velocity = texture2D( velocityTexture, uv ).xy * velocityScale;
+					if( length( velocity ) > maxArrowSize )
+						velocity = normalize( velocity ) * maxArrowSize;
+					vec4 lineEnd = lineStart + vec4( velocity, 0.0, 0.0 );
 
-				float alpha = 0.3 + 0.3 * ( length( velocity ) / maxArrowSize );
+					float alpha = 0.3 + 0.3 * ( length( velocity ) / maxArrowSize );
 
-				float temperature = texture2D( temperatureTexture, uv ).x * temperatureScale;
-				float warm = pow( max( 0.0, temperature ), 0.5 );
-				float cold = pow( max( 0.0, -temperature ), 0.5 );
-				float red = 1.0 - cold;
-				float green = 1.0 - cold - warm;
-				float blue = 1.0 - warm;
+					float temperature = texture2D( temperatureTexture, uv ).x * temperatureScale;
+					float warm = pow( max( 0.0, temperature ), 0.5 );
+					float cold = pow( max( 0.0, -temperature ), 0.5 );
+					float red = 1.0 - cold;
+					float green = 1.0 - cold - warm;
+					float blue = 1.0 - warm;
 
-				vec4 color = vec4( red, green, blue, alpha );
+					vec4 color = vec4( red, green, blue, alpha );
 
-				float arrowLength = 0.75 * length( velocity );
+					float arrowLength = 0.75 * length( velocity );
 
-				vec2 nVel = normalize( velocity );
-				float arrowAngleA = atan( nVel.y, nVel.x ) + 0.2;
-				float arrowAngleB = atan( nVel.y, nVel.x ) - 0.2;
+					vec2 nVel = normalize( velocity );
+					float arrowAngleA = atan( nVel.y, nVel.x ) + 0.2;
+					float arrowAngleB = atan( nVel.y, nVel.x ) - 0.2;
 
-				vec4 arrowLineA = vec4( cos( arrowAngleA ), sin( arrowAngleA ), 0., 0. );
-				vec4 arrowLineB = vec4( cos( arrowAngleB ), sin( arrowAngleB ), 0., 0. );
-				arrowLineA = normalize( arrowLineA ) * arrowLength;
-				arrowLineB = normalize( arrowLineB ) * arrowLength;
-				vec4 arrowA = lineStart + arrowLineA;
-				vec4 arrowB = lineStart + arrowLineB;
+					vec4 arrowLineA = vec4( cos( arrowAngleA ), sin( arrowAngleA ), 0., 0. );
+					vec4 arrowLineB = vec4( cos( arrowAngleB ), sin( arrowAngleB ), 0., 0. );
+					arrowLineA = normalize( arrowLineA ) * arrowLength;
+					arrowLineB = normalize( arrowLineB ) * arrowLength;
+					vec4 arrowA = lineStart + arrowLineA;
+					vec4 arrowB = lineStart + arrowLineB;
 
-				gl_Position = gl_ModelViewProjectionMatrix * lineStart;
-				gl_FrontColor = color;
-				EmitVertex();
+					gl_Position = gl_ModelViewProjectionMatrix * lineStart;
+					gl_FrontColor = color;
+					EmitVertex();
 
-				gl_Position = gl_ModelViewProjectionMatrix * lineEnd;
-				gl_FrontColor = color;
-				EmitVertex();
+					gl_Position = gl_ModelViewProjectionMatrix * lineEnd;
+					gl_FrontColor = color;
+					EmitVertex();
 
-				gl_Position = gl_ModelViewProjectionMatrix * arrowA;
-				gl_FrontColor = color;
-				EmitVertex();
+					gl_Position = gl_ModelViewProjectionMatrix * arrowA;
+					gl_FrontColor = color;
+					EmitVertex();
 
-				gl_Position = gl_ModelViewProjectionMatrix * lineEnd;
-				gl_FrontColor = color;
-				EmitVertex();
+					gl_Position = gl_ModelViewProjectionMatrix * lineEnd;
+					gl_FrontColor = color;
+					EmitVertex();
 
-				gl_Position = gl_ModelViewProjectionMatrix * arrowB;
-				gl_FrontColor = color;
-				EmitVertex();
+					gl_Position = gl_ModelViewProjectionMatrix * arrowB;
+					gl_FrontColor = color;
+					EmitVertex();
 
-				EndPrimitive();
-			}
+					EndPrimitive();
+				}
 			);
 
 			ofLogVerbose( "Maximum number of output vertices support is: " + ofToString( shader.getGeometryMaxOutputCount() ) );
@@ -148,111 +148,113 @@ namespace flowTools {
 
 			string geometryShader;
 
-			vertexShader = GLSLES300(
+			vertexShader = GLSLES300
+			(
+				uniform mat4 modelViewProjectionMatrix;
+				uniform mat4 textureMatrix;
 
-			uniform mat4 modelViewProjectionMatrix;
-			uniform mat4 textureMatrix;
+				in vec4	position;
+				in vec2	texcoord;
+				in vec4	color;
 
-			in vec4	position;
-			in vec2	texcoord;
-			in vec4	color;
+				out vec2 texCoordVarying;
+				out vec4 colorVarying;
 
-			out vec2 texCoordVarying;
-			out vec4 colorVarying;
-
-			void main()
-			{
-				colorVarying = color;
-				gl_Position = position;
-			}
+				void main()
+				{
+					colorVarying = color;
+					gl_Position = position;
+				}
 
 			);
 
-			geometryShader = GLSLES300GEO(
+			geometryShader = GLSLES300GEO
+			(
 
-			uniform mat4 modelViewProjectionMatrix;
-			uniform sampler2DRect velocityTexture;
-			uniform sampler2DRect temperatureTexture;
+				uniform mat4 modelViewProjectionMatrix;
+				uniform sampler2D velocityTexture;
+				uniform sampler2D temperatureTexture;
 
-			uniform vec2 texResolution;
-			uniform float velocityScale;
-			uniform float temperatureScale;
-			uniform float maxArrowSize;
+				uniform vec2 texResolution;
+				uniform float velocityScale;
+				uniform float temperatureScale;
+				uniform float maxArrowSize;
 
-			layout( points ) in;
-			layout( line_strip ) out;
-			layout( max_vertices = 5 ) out;
+				layout( points ) in;
+				layout( line_strip ) out;
+				layout( max_vertices = 5 ) out;
 
-			out vec4 colorVarying;
+				out vec4 colorVarying;
 
-			void main()
-			{
-				vec4 lineStart = gl_in[ 0 ].gl_Position;;
+				void main()
+				{
+					vec4 lineStart = gl_in[ 0 ].gl_Position;;
 
-				vec2 uv = lineStart.xy * texResolution;
-				vec2 velocity = texture( velocityTexture, uv ).xy * velocityScale;
-				if( length( velocity ) > maxArrowSize )
-					velocity = normalize( velocity ) * maxArrowSize;
-				vec4 lineEnd = lineStart + vec4( velocity, 0.0, 0.0 );
+					vec2 uv = lineStart.xy * texResolution;
+					vec2 velocity = texture( velocityTexture, uv ).xy * velocityScale;
+					if( length( velocity ) > maxArrowSize )
+						velocity = normalize( velocity ) * maxArrowSize;
+					vec4 lineEnd = lineStart + vec4( velocity, 0.0, 0.0 );
 
-				float alpha = 0.3 + 0.3 * ( length( velocity ) / maxArrowSize );
+					float alpha = 0.3 + 0.3 * ( length( velocity ) / maxArrowSize );
 
-				float temperature = texture( temperatureTexture, uv ).x * temperatureScale;
-				float warm = pow( max( 0.0, temperature ), 0.5 );
-				float cold = pow( max( 0.0, -temperature ), 0.5 );
-				float red = 1.0 - cold;
-				float green = 1.0 - cold - warm;
-				float blue = 1.0 - warm;
+					float temperature = texture( temperatureTexture, uv ).x * temperatureScale;
+					float warm = pow( max( 0.0, temperature ), 0.5 );
+					float cold = pow( max( 0.0, -temperature ), 0.5 );
+					float red = 1.0 - cold;
+					float green = 1.0 - cold - warm;
+					float blue = 1.0 - warm;
 
-				vec4 color = vec4( red, green, blue, alpha );
+					vec4 color = vec4( red, green, blue, alpha );
 
-				float arrowLength = 0.75 * length( velocity );
+					float arrowLength = 0.75 * length( velocity );
 
-				vec2 nVel = normalize( velocity );
-				float arrowAngleA = atan( nVel.y, nVel.x ) + 0.15;
-				float arrowAngleB = atan( nVel.y, nVel.x ) - 0.15;
+					vec2 nVel = normalize( velocity );
+					float arrowAngleA = atan( nVel.y, nVel.x ) + 0.15;
+					float arrowAngleB = atan( nVel.y, nVel.x ) - 0.15;
 
-				vec4 arrowLineA = vec4( cos( arrowAngleA ), sin( arrowAngleA ), 0., 0. );
-				vec4 arrowLineB = vec4( cos( arrowAngleB ), sin( arrowAngleB ), 0., 0. );
-				arrowLineA = normalize( arrowLineA ) * arrowLength;
-				arrowLineB = normalize( arrowLineB ) * arrowLength;
-				vec4 arrowA = lineStart + arrowLineA;
-				vec4 arrowB = lineStart + arrowLineB;
+					vec4 arrowLineA = vec4( cos( arrowAngleA ), sin( arrowAngleA ), 0., 0. );
+					vec4 arrowLineB = vec4( cos( arrowAngleB ), sin( arrowAngleB ), 0., 0. );
+					arrowLineA = normalize( arrowLineA ) * arrowLength;
+					arrowLineB = normalize( arrowLineB ) * arrowLength;
+					vec4 arrowA = lineStart + arrowLineA;
+					vec4 arrowB = lineStart + arrowLineB;
 
-				gl_Position = modelViewProjectionMatrix * lineStart;
-				colorVarying = color;
-				EmitVertex();
+					gl_Position = modelViewProjectionMatrix * lineStart;
+					colorVarying = color;
+					EmitVertex();
 
-				gl_Position = modelViewProjectionMatrix * lineEnd;
-				colorVarying = color;
-				EmitVertex();
+					gl_Position = modelViewProjectionMatrix * lineEnd;
+					colorVarying = color;
+					EmitVertex();
 
-				gl_Position = modelViewProjectionMatrix * arrowA;
-				colorVarying = color;
-				EmitVertex();
+					gl_Position = modelViewProjectionMatrix * arrowA;
+					colorVarying = color;
+					EmitVertex();
 
-				gl_Position = modelViewProjectionMatrix * lineEnd;
-				colorVarying = color;
-				EmitVertex();
+					gl_Position = modelViewProjectionMatrix * lineEnd;
+					colorVarying = color;
+					EmitVertex();
 
-				gl_Position = modelViewProjectionMatrix * arrowB;
-				colorVarying = color;
-				EmitVertex();
+					gl_Position = modelViewProjectionMatrix * arrowB;
+					colorVarying = color;
+					EmitVertex();
 
-				EndPrimitive();
+					EndPrimitive();
 
-			}
+				}
 			);
 
-			fragmentShader = GLSLES300(
+			fragmentShader = GLSLES300
+			(
 
-			in vec4 colorVarying;
-			out vec4 fragColor;
+				in vec4 colorVarying;
+				out vec4 fragColor;
 
-			void main()
-			{
-				fragColor = colorVarying;
-			}
+				void main()
+				{
+					fragColor = colorVarying;
+				}
 			);
 
 			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );

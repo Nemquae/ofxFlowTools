@@ -86,68 +86,68 @@ namespace flowTools {
 
 		void glESThree()
 		{
-			vertexShader = GLSLES300(
+			vertexShader = GLSLES300
+			(
+				uniform	mat4 modelViewProjectionMatrix;
+				uniform	mat4 textureMatrix;
+				uniform	sampler2D PositionTexture;
+				uniform	sampler2D ALMSTexture;
+				uniform	vec3 Color;
 
-			uniform	mat4 modelViewProjectionMatrix;
-			uniform	mat4 textureMatrix;
-			uniform	sampler2DRect PositionTexture;
-			uniform	sampler2DRect ALMSTexture;
-			uniform	vec3 Color;
+				in vec4	position;
+				in vec2	texcoord;
+				in vec4	color;
 
-			in vec4	position;
-			in vec2	texcoord;
-			in vec4	color;
+				uniform float TwinkleSpeed;
 
-			uniform float TwinkleSpeed;
+				out vec2 texCoordVarying;
+				out vec4 colorVarying;
 
-			out vec2 texCoordVarying;
-			out vec4 colorVarying;
-
-			void main()
-			{
-				colorVarying = color;
-				texCoordVarying = ( textureMatrix*vec4( texcoord.x, texcoord.y, 0, 1 ) ).xy;
+				void main()
+				{
+					colorVarying = color;
+					texCoordVarying = ( textureMatrix*vec4( texcoord.x, texcoord.y, 0, 1 ) ).xy;
 
 
-				vec2 st = position.xy;
-				vec2 texPos = texture( PositionTexture, st ).xy;
-				gl_Position = modelViewProjectionMatrix * vec4( texPos, 0.0, 1.0 );
+					vec2 st = position.xy;
+					vec2 texPos = texture( PositionTexture, st ).xy;
+					gl_Position = modelViewProjectionMatrix * vec4( texPos, 0.0, 1.0 );
 
-				vec4 alms = texture( ALMSTexture, st );
-				float age = alms.x;
-				float life = alms.y;
-				float mass = alms.z;
-				float size = alms.w;
-				gl_PointSize = size;
+					vec4 alms = texture( ALMSTexture, st );
+					float age = alms.x;
+					float life = alms.y;
+					float mass = alms.z;
+					float size = alms.w;
+					gl_PointSize = size;
 
-				float alpha = min( 0.5 - ( age / life ) * 0.5, age * 5. );
-				alpha *= 0.5 + ( cos( ( age + size ) * TwinkleSpeed * mass ) + 1.0 ) * 0.5;
-				alpha = max( alpha, 0.0 );
+					float alpha = min( 0.5 - ( age / life ) * 0.5, age * 5. );
+					alpha *= 0.5 + ( cos( ( age + size ) * TwinkleSpeed * mass ) + 1.0 ) * 0.5;
+					alpha = max( alpha, 0.0 );
 
-				colorVarying = vec4( Color, alpha );
-			}
+					colorVarying = vec4( Color, alpha );
+				}
 			);
 
 
 
 			// thanx to: http://mmmovania.blogspot.nl/2010/12/circular-point-sprites-in-opengl-33.html
 
-			fragmentShader = GLSLES300(
+			fragmentShader = GLSLES300
+			(
+				in vec4 colorVarying;
+				out vec4 fragColor;
 
-			in vec4 colorVarying;
-			out vec4 fragColor;
+				void main()
+				{
+					vec2 p = gl_PointCoord * 2.0 - vec2( 1.0 );
+					float d = dot( p, p );
+					float r = sqrt( d );
 
-			void main()
-			{
-				vec2 p = gl_PointCoord * 2.0 - vec2( 1.0 );
-				float d = dot( p, p );
-				float r = sqrt( d );
-
-				if( d > r )
-					discard;
-				else
-					fragColor = colorVarying * ( 1.0, 1.0, 1.0, 1.0 - pow( r, 2.5 ) );
-			}
+					if( d > r )
+						discard;
+					else
+						fragColor = colorVarying * ( 1.0, 1.0, 1.0, 1.0 - pow( r, 2.5 ) );
+				}
 			);
 
 			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );

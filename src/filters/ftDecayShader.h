@@ -63,22 +63,23 @@ namespace flowTools {
 		void glESThree()
 		{
 
-			fragmentShader = GLSLES300(
-				uniform sampler2DRect tex0;
-			uniform sampler2DRect tex1;
-			uniform float decay;
+			fragmentShader = GLSLES300
+			(
+				uniform sampler2D tex0;
+				uniform sampler2D tex1;
+				uniform float decay;
 
-			in vec2 texCoordVarying;
-			out vec4 fragColor;
+				in vec2 texCoordVarying;
+				out vec4 fragColor;
 
-			void main()
-			{
-				vec4 color0 = texture( tex0, texCoordVarying );
-				vec4 color1 = texture( tex1, texCoordVarying );
-				color0 *= vec4( 1.0 - decay );
+				void main()
+				{
+					vec4 color0 = texture( tex0, texCoordVarying );
+					vec4 color1 = texture( tex1, texCoordVarying );
+					color0 *= vec4( 1.0 - decay );
 
-				fragColor = color0 + color1;
-			}
+					fragColor = color0 + color1;
+				}
 			);
 
 			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );

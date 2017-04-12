@@ -70,57 +70,57 @@ namespace flowTools {
 
 			string geometryShader;
 
-			vertexShader = GLSLES300(
+			vertexShader = GLSLES300
+			(
+				uniform mat4 modelViewProjectionMatrix;
+				uniform mat4 textureMatrix;
+				uniform sampler2D velocityTexture;
+				uniform vec2 texResolution;
+				uniform float displacementScale;
+				uniform float sizeScale;
+				uniform float minDotSize;
+				uniform float maxDotSize;
 
-			uniform mat4 modelViewProjectionMatrix;
-			uniform mat4 textureMatrix;
-			uniform sampler2DRect velocityTexture;
-			uniform vec2 texResolution;
-			uniform float displacementScale;
-			uniform float sizeScale;
-			uniform float minDotSize;
-			uniform float maxDotSize;
+				in vec4 position;
+				in vec2 texcoord;
+				in vec4 color;
 
-			in vec4 position;
-			in vec2 texcoord;
-			in vec4 color;
-
-			out vec2 texCoordVarying;
-			out vec4 colorVarying;
+				out vec2 texCoordVarying;
+				out vec4 colorVarying;
 
 
-			void main()
-			{
-				colorVarying = color;
-				texCoordVarying = ( textureMatrix*vec4( texcoord.x, texcoord.y, 0, 1 ) ).xy;
+				void main()
+				{
+					colorVarying = color;
+					texCoordVarying = ( textureMatrix*vec4( texcoord.x, texcoord.y, 0, 1 ) ).xy;
 
-				vec2 st = position.xy * texResolution;
-				vec2 vel = texture( velocityTexture, st ).xy;
+					vec2 st = position.xy * texResolution;
+					vec2 vel = texture( velocityTexture, st ).xy;
 
-				vec2 displacement = vel / vec2( displacementScale, displacementScale );
-				gl_Position = modelViewProjectionMatrix * position + vec4( displacement, 0.0, 1.0 );
+					vec2 displacement = vel / vec2( displacementScale, displacementScale );
+					gl_Position = modelViewProjectionMatrix * position + vec4( displacement, 0.0, 1.0 );
 
-				gl_PointSize = max( maxDotSize - ( length( vel ) * sizeScale ), minDotSize );
-			}
+					gl_PointSize = max( maxDotSize - ( length( vel ) * sizeScale ), minDotSize );
+				}
 
 			);
 
-			fragmentShader = GLSLES300(
+			fragmentShader = GLSLES300
+			(
+				in vec4 colorVarying;
+				out vec4 fragColor;
 
-			in vec4 colorVarying;
-			out vec4 fragColor;
+				void main()
+				{
+					vec2 p = gl_PointCoord * 2.0 - vec2( 1.0 );
+					float d = dot( p, p );
+					float r = sqrt( d );
 
-			void main()
-			{
-				vec2 p = gl_PointCoord * 2.0 - vec2( 1.0 );
-				float d = dot( p, p );
-				float r = sqrt( d );
-
-				if( d > r )
-					discard;
-				else
-					fragColor = colorVarying * vec4( 1.0, 1.0, 1.0, 1.0 - pow( r, 8.5 ) ); // power is for gradient edge
-			}
+					if( d > r )
+						discard;
+					else
+						fragColor = colorVarying * vec4( 1.0, 1.0, 1.0, 1.0 - pow( r, 8.5 ) ); // power is for gradient edge
+				}
 			);
 
 			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
