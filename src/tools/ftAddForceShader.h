@@ -73,6 +73,7 @@ namespace flowTools {
 				uniform vec2	Scale;
 
 				in vec2 texCoordVarying;
+                in vec4 colorVarying;
 				out vec4 fragColor;
 
 				void main()

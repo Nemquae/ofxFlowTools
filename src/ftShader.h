@@ -6,7 +6,7 @@
 #define GLSLES100PI(shader)  "#version 100 \n #define PI 3.1415926535897932 \n #define HALF_PI 1.5707963267948966 \n precision mediump float; \n precision mediump sampler2D; \n" #shader
 #define GLSLES100GEO(shader)  "#version 100 \n #extension GL_EXT_geometry_shader4: enable \n precision mediump float; \n precision mediump sampler2D; \n" #shader
 
-#define GLSLES300(shader)  "#version 300 es \n precision mediump float; \n precision mediump sampler2DRect; \n" #shader
+#define GLSLES300(shader)  "#version 300 es \n precision mediump float; \n precision mediump sampler2D; \n" #shader
 #define GLSLES300PI(shader)  "#version 300 es \n #define PI 3.1415926535897932 \n #define HALF_PI 1.5707963267948966 \n precision mediump float; \n precision mediump sampler2D; \n" #shader
 #define GLSLES300GEO(shader)  "#version 300 es \n #extension GL_EXT_geometry_shader4: enable \n precision mediump float; \n precision mediump sampler2D; \n" #shader
 
@@ -76,6 +76,7 @@ namespace flowTools {
 				in vec4	position;
 				in vec2	texcoord;
 				in vec4	color;
+                in vec4 normal;
 
 				out vec2 texCoordVarying;
 				out vec4 colorVarying;
@@ -91,6 +92,9 @@ namespace flowTools {
 			fragmentShader = GLSLES300
 			(
 				out vec4 fragColor;
+             
+                in vec2 texCoordVarying;
+                in vec4 colorVarying;
 
 				void main()
 				{

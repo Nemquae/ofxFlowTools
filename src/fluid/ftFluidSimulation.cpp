@@ -205,7 +205,7 @@ namespace flowTools {
 			addTempObstacleBuffer.black();
 			combinedObstacleNeedsToBeCleaned = true;
 		}
-		ofEnableBlendMode(OF_BLENDMODE_DISABLED);
+		//ofEnableBlendMode(OF_BLENDMODE_DISABLED);
 
 		// CLAMP LENGTH
 		if (maxDensity.get() > 0.0) {
