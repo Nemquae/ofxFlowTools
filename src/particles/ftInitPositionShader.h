@@ -60,7 +60,7 @@ namespace flowTools {
 		void glESThree()
 		{
 
-			fragmentShader = GLSLES100
+            fragmentShader = GLSLES300
 			(
 				uniform vec2 Dimensions;
 

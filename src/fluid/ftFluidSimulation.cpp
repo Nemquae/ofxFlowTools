@@ -42,22 +42,6 @@
 #include "ofColor.h"
 #endif
 
-#ifndef GL_RGBA32F
-#define GL_RGBA32F GL_RGBA
-#endif
-
-#ifndef GL_RG32F
-#define GL_RG32F GL_RGB
-#endif
-
-#ifndef GL_R32F
-#define GL_R32F GL_RGB
-#endif
-
-#ifndef GL_R8
-#define GL_R8 GL_RGB
-#endif
-
 namespace flowTools {
 	
 	ftFluidSimulation::ftFluidSimulation(){
@@ -114,11 +98,17 @@ namespace flowTools {
 		simulationHeight = _simulationHeight;
 		densityWidth = (!_densityWidth)? simulationWidth : _densityWidth;
 		densityHeight = (!_densityHeight)? simulationHeight: _densityHeight;
-		
+#if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
+        int	internalFormatDensity = GL_RGBA;
+        int	internalFormatVelocity = GL_RGB;
+        int	interformatPressure = GL_RGB;
+        int	internalFormatObstacle = GL_RGB;
+#else
 		int	internalFormatDensity = GL_RGBA32F;
 		int	internalFormatVelocity = GL_RG32F;
 		int	interformatPressure = GL_R32F;
 		int	internalFormatObstacle = GL_R8;
+#endif
 			
 		whiteSwapBuffer.allocate(densityWidth, densityHeight, internalFormatDensity);
 		whiteSwapBuffer.black();

@@ -39,10 +39,6 @@
 //#include "gl2ext.h"
 #endif
 
-#ifndef GL_RGB32F
-#define GL_RGB32F GL_RGB
-#endif
-
 namespace flowTools {
 	
 	ftOpticalFlow::ftOpticalFlow(){
@@ -71,7 +67,36 @@ namespace flowTools {
 
 		width = _width;
 		height = _height;
-				
+        
+#ifdef DEBUG_GL_ERRORS
+        stringstream ss;
+        GLint result;
+        ss << "GL Error 1a1 = " << glGetError() << std::endl;
+        ss << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
+        glGetIntegerv(GL_FRAMEBUFFER_BINDING, &result);
+        ss << result << std::endl;
+        ofLogNotice( ss.str() );
+#endif // DEBUG_GL_ERRORS
+        
+#if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
+        sourceSwapBuffer.allocate(width, height);
+        
+#ifdef DEBUG_GL_ERRORS
+        ss.clear();
+        ss << "GL Error 1a2 = " << glGetError() << std::endl;
+        ss << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
+        ofLogNotice( ss.str() );
+#endif // DEBUG_GL_ERRORS
+
+        
+        velocityBuffer.allocate(width, height, GL_RGB);
+        velocityBuffer.black();
+        
+        velocityTexture.allocate(width, height, GL_RGB);
+        
+        decayBuffer.allocate(width, height, GL_RGB);
+        decayBuffer.black();
+#else
 		sourceSwapBuffer.allocate(width, height);
 		velocityBuffer.allocate(width, height, GL_RGB32F);
 		velocityBuffer.black();
@@ -80,6 +105,8 @@ namespace flowTools {
 		
 		decayBuffer.allocate(width, height, GL_RGB32F);
 		decayBuffer.black();
+#endif
+        
 		
 //		flowVectors = new ofVec2f[int(width * height)];
 //		flowFloats = new float [int(width * height) * 2];

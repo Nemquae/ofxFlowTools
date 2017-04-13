@@ -12,17 +12,24 @@
 namespace flowTools {
 	
 	ftDrawInputForces::ftDrawInputForces() {
+        #if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
+        ofAddListener( ofEvents().touchMoved, this, &ftDrawInputForces::touchMoved );
+        ofAddListener( ofEvents().touchDown, this, &ftDrawInputForces::touchDown );
+        #else
 		ofAddListener(ofEvents().mouseMoved, this, &ftDrawInputForces::mouseMoved);
 		ofAddListener(ofEvents().mouseDragged, this, &ftDrawInputForces::mouseDragged);
-		ofAddListener( ofEvents().touchMoved, this, &ftDrawInputForces::touchMoved );
-		ofAddListener( ofEvents().touchDown, this, &ftDrawInputForces::touchDown );
+        #endif
+
 	}
     
     ftDrawInputForces::~ftDrawInputForces() {
+        #if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
+        ofRemoveListener( ofEvents().touchMoved, this, &ftDrawInputForces::touchMoved );
+        ofRemoveListener( ofEvents().touchDown, this, &ftDrawInputForces::touchDown );
+        #else
         ofRemoveListener(ofEvents().mouseMoved, this, &ftDrawInputForces::mouseMoved);
         ofRemoveListener(ofEvents().mouseDragged, this, &ftDrawInputForces::mouseDragged);
-		ofRemoveListener( ofEvents().touchMoved, this, &ftDrawInputForces::touchMoved );
-		ofRemoveListener( ofEvents().touchDown, this, &ftDrawInputForces::touchDown );
+        #endif
     }
 	
 	void ftDrawInputForces::setup(int _simulationWidth, int _simulationHeight, int _densityWidth, int _densityHeight) {
@@ -57,7 +64,7 @@ namespace flowTools {
 		drawForces[ 10 ].setName( "draw flow res 1" );
 		drawForces[ 11 ].setup( simulationWidth, simulationHeight, FT_TEMPERATURE, true );
 		drawForces[ 11 ].setName( "draw flow res 2" );
-		
+        
 		leftButtonParameters.setName("mouse left button");
 		leftButtonParameters.add(doResetDrawForces.set("reset", false));
 		rightButtonParameters.setName("mouse right button");
@@ -67,6 +74,9 @@ namespace flowTools {
 		singleTouchParameters.setName( "single touch" );
 		singleTouchParameters.add( doResetDrawForces.set( "reset", false ) );
 		doResetDrawForces.addListener(this, &ftDrawInputForces::resetDrawForcesListner);
+        
+
+        
 		for (int i=0; i<3; i++) {
 			leftButtonParameters.add(drawForces[i].parameters);
 			rightButtonParameters.add(drawForces[i+3].parameters);
@@ -190,6 +200,8 @@ namespace flowTools {
 	//---------------------------------------------------------------------------------------------
 	void ftDrawInputForces::touchDown( ofTouchEventArgs& touch)
 	{
+        ofLogWarning() << "Touch: (" << touch.x << ", " << touch.y << ")" << std::endl;
+        
 		ofVec2f normalizedTouch;
 		normalizedTouch.set  ( touch.x / (float)ofGetWindowWidth()
 							 , touch.y / (float)ofGetWindowHeight()
@@ -200,6 +212,9 @@ namespace flowTools {
 	//---------------------------------------------------------------------------------------------
 	void ftDrawInputForces::touchMoved( ofTouchEventArgs& touch)
 	{
+        ofLogWarning() << "Touch: (" << touch.x << ", " << touch.y << ")" << std::endl;
+        //ofLogWarning() << "       (" << touch.xspeed << ", " << touch.yspeed << ")" << std::endl;
+        
 		ofVec2f normalizedTouch;
 		normalizedTouch.set( touch.x / (float)ofGetWindowWidth()
 							 , touch.y / (float)ofGetWindowHeight()

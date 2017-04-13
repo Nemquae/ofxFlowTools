@@ -9,9 +9,9 @@
 //#include "gl2ext.h"
 #endif
 
-#ifndef GL_GEOMETRY_SHADER_EXT
-#define GL_GEOMETRY_SHADER_EXT -1
-#endif
+//#ifndef GL_GEOMETRY_SHADER_EXT
+//#define GL_GEOMETRY_SHADER_EXT -1
+//#endif
 
 namespace flowTools {
 	
@@ -259,7 +259,7 @@ namespace flowTools {
 
 			bInitialized *= shader.setupShaderFromSource( GL_VERTEX_SHADER, vertexShader );
 			bInitialized *= shader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragmentShader );
-			bInitialized *= shader.setupShaderFromSource( GL_GEOMETRY_SHADER_EXT, geometryShader );
+			//bInitialized *= shader.setupShaderFromSource( GL_GEOMETRY_SHADER_EXT, geometryShader );
 			bInitialized *= shader.bindDefaults();
 			bInitialized *= shader.linkProgram();
 		}
@@ -352,7 +352,9 @@ namespace flowTools {
 			shader.setGeometryOutputCount(5);
 			bInitialized *= shader.setupShaderFromSource(GL_VERTEX_SHADER, vertexShader);
 			bInitialized *= shader.setupShaderFromSource(GL_FRAGMENT_SHADER, fragmentShader);
+            #if !((TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS))
 			bInitialized *= shader.setupShaderFromSource(GL_GEOMETRY_SHADER_EXT, geometryShader);
+            #endif
 			bInitialized *= shader.linkProgram();
 			
 		}
@@ -466,7 +468,9 @@ namespace flowTools {
 			
 			bInitialized *= shader.setupShaderFromSource(GL_VERTEX_SHADER, vertexShader);
 			bInitialized *= shader.setupShaderFromSource(GL_FRAGMENT_SHADER, fragmentShader);
+            #if !((TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS))
 			bInitialized *= shader.setupShaderFromSource(GL_GEOMETRY_SHADER_EXT, geometryShader);
+            #endif
 			bInitialized *= shader.bindDefaults();
 			bInitialized *= shader.linkProgram();
 		}

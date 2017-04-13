@@ -21,9 +21,30 @@ namespace flowTools {
 				FBOs[i].allocate(mySettings);
 			}
 			
+#ifdef DEBUG_GL_ERRORS
+            stringstream ss;
+            GLint result;
+            ss << "GL Error ofFbo.allocate 11 = " << glGetError() << std::endl;
+            ss << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
+            glGetIntegerv(GL_FRAMEBUFFER_BINDING, &result);
+            ss << result << std::endl;
+            ofLogNotice( ss.str() );
+#endif // DEBUG_GL_ERRORS
 			black();
+#ifdef DEBUG_GL_ERRORS
+            ss.clear();
+            ss << "GL Error ofFbo.allocate 12 = " << glGetError() << std::endl;
+            ss << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
+            ofLogNotice( ss.str() );
+#endif // DEBUG_GL_ERRORS
 			flag = 0;
 			swap();
+#ifdef DEBUG_GL_ERRORS
+            ss.clear();
+            ss << "GL Error ofFbo.allocate 13 = " << glGetError() << std::endl;
+            ss << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
+            ofLogNotice( ss.str() );
+#endif // DEBUG_GL_ERRORS
 		}
 		
 		void swap(){

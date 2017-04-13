@@ -37,13 +37,6 @@
 //#include "gl2ext.h"
 #endif
 
-#ifndef GL_RG32F
-#define GL_RG32F GL_RGB
-#endif
-
-#ifndef GL_RGBA32F
-#define GL_RGBA32F GL_RGBA
-#endif
 
 namespace flowTools {
 	
@@ -87,6 +80,34 @@ namespace flowTools {
 			}
 		}
 		
+#if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
+        int internalFormatVelocity = GL_RGB;
+        
+        ofPushStyle();
+        ofEnableBlendMode(OF_BLENDMODE_DISABLED);  // Why?
+        
+        
+        particleAgeLifespanMassSizeSwapBuffer.allocate(numParticlesX, numParticlesY, GL_RGBA, GL_NEAREST);
+        particleAgeLifespanMassSizeSwapBuffer.black();
+        particlePositionSwapBuffer.allocate(numParticlesX, numParticlesY, internalFormatVelocity, GL_NEAREST);
+        particlePositionSwapBuffer.black();
+        initPositionShader.update(*particlePositionSwapBuffer.getBuffer());
+        particlePositionSwapBuffer.swap();
+        particleHomeBuffer.allocate(numParticlesX, numParticlesY, internalFormatVelocity);
+        particleHomeBuffer.black();
+        initPositionShader.update(particleHomeBuffer);
+        
+        fluidVelocitySwapBuffer.allocate(simulationWidth, simulationHeight, internalFormatVelocity);
+        fluidVelocitySwapBuffer.black();
+        flowVelocitySwapBuffer.allocate(simulationWidth, simulationHeight, internalFormatVelocity);
+        flowVelocitySwapBuffer.black();
+        densitySwapBuffer.allocate(simulationWidth, simulationHeight, GL_RGBA);
+        densitySwapBuffer.black();
+        obstacleBuffer.allocate(simulationWidth, simulationHeight, GL_RGB); // GL_RED??
+        obstacleBuffer.black();
+        
+        ofPopStyle();
+#else
 		int internalFormatVelocity = GL_RG32F;
 		
 		ofPushStyle();
@@ -113,6 +134,7 @@ namespace flowTools {
 		obstacleBuffer.black();
 		
 		ofPopStyle();
+#endif
 		
 	}
 	
