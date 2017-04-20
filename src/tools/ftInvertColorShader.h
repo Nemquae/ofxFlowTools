@@ -64,9 +64,12 @@ protected:
 
 			//if (color.w > 0.1)
 			//{
-			color.x = 1.0 - color.x;
-			color.y = 1.0 - color.y;
-			color.z = 1.0 - color.z;
+			float max = max( color.x, max( color.y, color.z ) );
+			float min = min( color.x, min( color.y, color.z ) );
+
+			color.x = 1.0 - ( min * min / max + max - color.x );//color.x;//max(color.x, 0.0);
+			color.y = 1.0 - ( min * min / max + max - color.y );//color.y;//max(color.y, 0.0);
+			color.z = 1.0 - ( min * min / max + max - color.z );//color.z;// max(color.z, 0.0);
 			//}
 			//else
 			//{
@@ -103,9 +106,13 @@ protected:
 				vec2 st = texCoordVarying;
 
 				vec4 color = texture( Backbuffer, st );
-				color.x = 1.0 - color.x;//max(color.x, 0.0);
-				color.y = 1.0 - color.y;//max(color.y, 0.0);
-				color.z = 1.0 - color.z;// max(color.z, 0.0);
+
+				float max = max( color.x, max( color.y, color.z ) );
+				float min = min( color.x, min( color.y, color.z ) );
+
+				color.x = 1.0 - ( min * min / max + max - color.x );//color.x;//max(color.x, 0.0);
+				color.y = 1.0 - ( min * min / max + max - color.y );//color.y;//max(color.y, 0.0);
+				color.z = 1.0 - ( min * min / max + max - color.z );//color.z;// max(color.z, 0.0);
 
 				fragColor = color;
 			}
@@ -131,9 +138,12 @@ protected:
 
 			//if (color.w > 0.1)
 			//{
-			color.x = 1.0 - color.x;
-			color.y = 1.0 - color.y;
-			color.z = 1.0 - color.z;
+			float max = max( color.x, max( color.y, color.z ) );
+			float min = min( color.x, min( color.y, color.z ) );
+
+			color.x = 1.0 - ( min * min / max + max - color.x );//color.x;//max(color.x, 0.0);
+			color.y = 1.0 - ( min * min / max + max - color.y );//color.y;//max(color.y, 0.0);
+			color.z = 1.0 - ( min * min / max + max - color.z );//color.z;// max(color.z, 0.0);
 			//}
 			//else
 			//{
@@ -168,9 +178,16 @@ protected:
 			vec2 st = texCoordVarying;
 
 			vec4 color = texture( Backbuffer, st );
-			color.x = 1.0 - color.x;//max(color.x, 0.0);
-			color.y = 1.0 - color.y;//max(color.y, 0.0);
-			color.z = 1.0 - color.z;// max(color.z, 0.0);
+			float max = max( color.x, max( color.y, color.z ) );
+			float min = min( color.x, min( color.y, color.z ) );
+
+			float iRed		= 1.0 - ( min * min / max + 2 * max - color.x );
+			float iGreen	= 1.0 - ( min * min / max + 2 * max - color.y );
+			float iBlue		= 1.0 - ( min * min / max + 2 * max - color.z );
+
+			color.x = max( ( 1 - floor( max + 0.5 ) ) * iRed,	color.x );//1.0 - ( min * min / max + max - color.x );//color.x;//max(color.x, 0.0);
+			color.y = max( ( 1 - floor( max + 0.5 ) ) * iGreen, color.y );//1.0 - ( min * min / max + max - color.y );//color.y;//max(color.y, 0.0);
+			color.z = max( ( 1 - floor( max + 0.5 ) ) * iBlue,	color.z );//1.0 - ( min * min / max + max - color.z );//color.z;// max(color.z, 0.0);
 
 			fragColor = color;
 		}
