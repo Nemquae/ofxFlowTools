@@ -24,6 +24,8 @@ namespace flowTools {
 		ftDrawForceType		getType(int _index);
 		ofTexture&			getTextureReference(int _index);
 		float				getStrength(int _index);
+
+		void				setColor( int _index, ofColor _color );
 		
 //		ofParameterGroup	parameters;
 		ofParameterGroup	leftButtonParameters;

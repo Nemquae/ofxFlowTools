@@ -8,7 +8,6 @@
 
 #include "ftDrawInputForces.h"
 
-
 namespace flowTools {
 	
 	ftDrawInputForces::ftDrawInputForces() {
@@ -84,6 +83,11 @@ namespace flowTools {
 			singleTouchParameters.add( drawForces[ i + 9 ].parameters );
 		}
 	}
+
+	void ftDrawInputForces::setColor( int _index, ofColor _color )
+	{
+		drawForces[ _index ].setForce( _color );
+	}
 	
 	void ftDrawInputForces::update(float _deltaTime) {
 		deltaTime = _deltaTime;
@@ -155,6 +159,7 @@ namespace flowTools {
 		normalizedMouse.set(mouse.x / (float)ofGetWindowWidth(), mouse.y / (float)ofGetWindowHeight());
 		
 		ofVec2f velocity = normalizedMouse - lastNormalizedMouse;
+
 		//velocity.normalize();
 		
 		if (mouse.button == 0) {
