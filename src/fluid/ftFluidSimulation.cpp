@@ -35,8 +35,9 @@
  *  ************************************************************************************ */
 
 #include "ftFluidSimulation.h"
+#include <sstream>
 
-#if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
+#if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS) || (TARGET_SURFACE)
 //#include "gl32.h"
 //#include "gl2ext.h"
 #include "ofColor.h"
@@ -79,6 +80,16 @@ namespace flowTools {
 	//--------------------------------------------------------------
 	void ftFluidSimulation::setup(int _simulationWidth, int _simulationHeight, int _densityWidth, int _densityHeight) {
 
+#ifdef DEBUG_GL_ERRORS
+		stringstream ss;
+		GLint result;
+		ss << "GL Error ofFbo.allocate FluidSim.setup 1 = " << glGetError() << std::endl;
+		ss << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
+		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &result);
+		ss << result << std::endl;
+		ofLogNotice(ss.str());
+#endif // DEBUG_GL_ERRORS
+
 		mixForceShader.setup();
 		invertColorShader.setup();
 		diffuseShader.setup();
@@ -94,11 +105,18 @@ namespace flowTools {
 		densityFloatMultiplierShader.setup();
 		densityVec2MultiplierShader.setup();
 
+#ifdef DEBUG_GL_ERRORS
+		ss.clear();
+		ss << "GL Error ofFbo.allocate FluidSim.setup 2 = " << glGetError() << std::endl;
+		ss << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
+		ofLogNotice(ss.str());
+#endif // DEBUG_GL_ERRORS
+
 		simulationWidth = _simulationWidth;
 		simulationHeight = _simulationHeight;
 		densityWidth = (!_densityWidth)? simulationWidth : _densityWidth;
 		densityHeight = (!_densityHeight)? simulationHeight: _densityHeight;
-#if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)
+#if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS) || (TARGET_SURFACE)
         int	internalFormatDensity = GL_RGBA;
         int	internalFormatVelocity = GL_RGB;
         int	interformatPressure = GL_RGB;
@@ -125,7 +143,22 @@ namespace flowTools {
 		
 		obstacleBuffer.allocate(simulationWidth, simulationHeight, internalFormatObstacle);
 		obstacleBuffer.black();
+
+#ifdef DEBUG_GL_ERRORS
+		ss.clear();
+		ss << "GL Error ofFbo.allocate FluidSim.setup 3 = " << glGetError() << std::endl;
+		ss << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
+		ofLogNotice(ss.str());
+#endif // DEBUG_GL_ERRORS
+
 		createEdgeImage(obstacleBuffer);
+
+#ifdef DEBUG_GL_ERRORS
+		ss.clear();
+		ss << "GL Error ofFbo.allocate FluidSim.setup 4 = " << glGetError() << std::endl;
+		ss << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
+		ofLogNotice(ss.str());
+#endif // DEBUG_GL_ERRORS
 		
 		divergenceBuffer.allocate(simulationWidth, simulationHeight, interformatPressure);
 		smokeBuoyancyBuffer.allocate(simulationWidth, simulationHeight, internalFormatVelocity);
@@ -140,6 +173,13 @@ namespace flowTools {
 		combinedObstacleBuffer.allocate(simulationWidth, simulationHeight, internalFormatObstacle);
 		combinedObstacleBuffer.black();
 		combinedObstacleBuffer.stretchIntoMe(obstacleBuffer);
+
+#ifdef DEBUG_GL_ERRORS
+		ss.clear();
+		ss << "GL Error ofFbo.allocate FluidSim.setup 5 = " << glGetError() << std::endl;
+		ss << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
+		ofLogNotice(ss.str());
+#endif // DEBUG_GL_ERRORS
 		
 		deltaTime = 0;
 		lastTime = 0;
@@ -620,6 +660,17 @@ namespace flowTools {
 		buffer.begin();
 		ofClear(_backgroundColor);
 		ofSetColor(_edgeColor);
+
+#ifdef DEBUG_GL_ERRORS
+		stringstream ss;
+		GLint result;
+		ss << "GL Error ofFbo.allocate FluidSim.createEdgeImage = " << glGetError() << std::endl;
+		ss << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
+		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &result);
+		ss << result << std::endl;
+		ofLogNotice(ss.str());
+#endif // DEBUG_GL_ERRORS
+
 		ofDrawRectangle(_edgeWidth, _edgeWidth, buffer.getWidth() - _edgeWidth * 2, buffer.getHeight() - _edgeWidth * 2);
 		buffer.end();
 		ofPopStyle();

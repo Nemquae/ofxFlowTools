@@ -3,6 +3,7 @@
 
 #include "ofMain.h"
 #include "ftVelocitySpheresShader.h"
+#include <sstream>
 
 namespace flowTools {
 	
@@ -10,10 +11,25 @@ namespace flowTools {
 	public:
 		
 		void	setup(int _width, int _height){
+
+#ifdef DEBUG_GL_ERRORS
+			std::stringstream ss;
+			ss << "GL Error 1c1 = " << glGetError() << std::endl;
+			ss << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
+			ofLogNotice(ss.str());
+#endif // DEBUG_GL_ERRORS
+
 			velocityFieldShader.setup();
 
 			width = _width;
 			height = _height;
+
+#ifdef DEBUG_GL_ERRORS
+			ss.clear();
+			ss << "GL Error 1c2 = " << glGetError() << std::endl;
+			ss << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
+			ofLogNotice(ss.str());
+#endif // DEBUG_GL_ERRORS
 			
 			fieldMesh.setMode(OF_PRIMITIVE_POINTS);
 			float xStep = 1. / width;
@@ -26,6 +42,13 @@ namespace flowTools {
 				}
 			}
 			fieldVbo.setMesh(fieldMesh, GL_DYNAMIC_DRAW, true, true, false);
+
+#ifdef DEBUG_GL_ERRORS
+			ss.clear();
+			ss << "GL Error 1c3 = " << glGetError() << std::endl;
+			ss << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
+			ofLogNotice(ss.str());
+#endif // DEBUG_GL_ERRORS
 			
 			parameters.setName("velocity dots");
 			parameters.add(distanceScale.set("distance scale", .1, 0, 1));

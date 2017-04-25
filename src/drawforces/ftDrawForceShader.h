@@ -166,7 +166,7 @@ namespace flowTools {
             #ifdef DEBUG_GL_ERRORS
             stringstream ss;
             ss << "GL Error DrawForceShader 1 = " << glGetError() << std::endl;
-            ss << glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES) << std::endl;
+            ss << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
             ofLogNotice(ss.str());
             #endif // DEBUG_GL_ERRORS
 
@@ -187,7 +187,7 @@ namespace flowTools {
             #ifdef DEBUG_GL_ERRORS
             ss.clear();
             ss << "GL Error DrawForceShader 2 = " << glGetError() << std::endl;
-            ss << glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES) << std::endl;
+            ss << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
             ofLogNotice(ss.str());
             #endif // DEBUG_GL_ERRORS
 			
