@@ -53,17 +53,17 @@ namespace flowTools {
 	void ftDrawForce::setup(int _width, int _height, ftDrawForceType _type, bool _isTemporary) {
 
 #ifdef DEBUG_GL_ERRORS
-        std::stringstream ss;
-        ss << "GL Error 1e1 = " << glGetError() << std::endl;
-        ofLogNotice( ss.str() );
+        std::stringstream ss; GLint result = glGetError();
+        ss << "GL Error 1e1 = " << result << std::endl;
+        if(result != 0) ofLogNotice( ss.str() );
 #endif // DEBUG_GL_ERRORS
         
 		drawForceShader.setup();
         
 #ifdef DEBUG_GL_ERRORS
-        ss.clear();
-        ss << "GL Error 1e2 = " << glGetError() << std::endl;
-        ofLogNotice( ss.str() );
+        ss.clear(); result = glGetError();
+        ss << "GL Error 1e2 = " << result << std::endl;
+        if(result != 0) ofLogNotice( ss.str() );
 #endif // DEBUG_GL_ERRORS
 
 		width = _width;
@@ -71,26 +71,26 @@ namespace flowTools {
 		type = _type;
         
 #ifdef DEBUG_GL_ERRORS
-        ss.clear();
-        ss << "GL Error 1e3 = " << glGetError() << std::endl;
-        ofLogNotice( ss.str() );
+        ss.clear(); result = glGetError();
+        ss << "GL Error 1e3 = " << result << std::endl;
+        if(result != 0) ofLogNotice( ss.str() );
 #endif // DEBUG_GL_ERRORS
         
 		drawType.set(type);
         
 #ifdef DEBUG_GL_ERRORS
-        ss.clear();
-        ss << "GL Error 1e4 = " << glGetError() << std::endl;
-        ofLogNotice( ss.str() );
+        ss.clear(); result = glGetError();
+        ss << "GL Error 1e4 = " << result << std::endl;
+        if(result != 0) ofLogNotice( ss.str() );
 #endif // DEBUG_GL_ERRORS
         
 		isTemporary.set(_isTemporary);
         
 #ifdef DEBUG_GL_ERRORS
-        ss.clear();
-        ss << "GL Error 1e5 = " << glGetError() << std::endl;
+        ss.clear(); result = glGetError();
+        ss << "GL Error 1e5 = " << result << std::endl;
         ss << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
-        ofLogNotice( ss.str() );
+        if(result != 0) ofLogNotice( ss.str() );
 #endif // DEBUG_GL_ERRORS
 			
         #if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) || (TARGET_IOS)

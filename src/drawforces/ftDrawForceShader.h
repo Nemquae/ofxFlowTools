@@ -164,10 +164,10 @@ namespace flowTools {
 		void update(ofFbo& _buffer, ofVec4f _value, ofPoint _point, float _radius, float _edge, float _invert){
             
             #ifdef DEBUG_GL_ERRORS
-            stringstream ss;
-            ss << "GL Error DrawForceShader 1 = " << glGetError() << std::endl;
+            stringstream ss; GLint result = glGetError();
+            ss << "GL Error DrawForceShader 1 = " << result << std::endl;
             ss << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
-            ofLogNotice(ss.str());
+            if(result != 0) ofLogNotice( ss.str() );
             #endif // DEBUG_GL_ERRORS
 
 			
@@ -185,10 +185,10 @@ namespace flowTools {
 			_buffer.end();
             
             #ifdef DEBUG_GL_ERRORS
-            ss.clear();
-            ss << "GL Error DrawForceShader 2 = " << glGetError() << std::endl;
+            ss.clear(); result = glGetError();
+            ss << "GL Error DrawForceShader 2 = " << result << std::endl;
             ss << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
-            ofLogNotice(ss.str());
+            if(result != 0) ofLogNotice( ss.str() );
             #endif // DEBUG_GL_ERRORS
 			
 		}

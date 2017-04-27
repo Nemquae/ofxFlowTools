@@ -13,10 +13,10 @@ namespace flowTools {
 		void	setup(int _width, int _height){
 
 #ifdef DEBUG_GL_ERRORS
-			std::stringstream ss;
-			ss << "GL Error 1c1 = " << glGetError() << std::endl;
+			std::stringstream ss; GLint result = glGetError();
+			ss << "GL Error 1c1 = " << result << std::endl;
 			ss << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
-			ofLogNotice(ss.str());
+			if(result != 0) ofLogNotice( ss.str() );
 #endif // DEBUG_GL_ERRORS
 
 			velocityFieldShader.setup();
@@ -25,10 +25,10 @@ namespace flowTools {
 			height = _height;
 
 #ifdef DEBUG_GL_ERRORS
-			ss.clear();
-			ss << "GL Error 1c2 = " << glGetError() << std::endl;
+			ss.clear(); result = glGetError();
+			ss << "GL Error 1c2 = " << result << std::endl;
 			ss << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
-			ofLogNotice(ss.str());
+			if(result != 0) ofLogNotice( ss.str() );
 #endif // DEBUG_GL_ERRORS
 			
 			fieldMesh.setMode(OF_PRIMITIVE_POINTS);
@@ -44,10 +44,10 @@ namespace flowTools {
 			fieldVbo.setMesh(fieldMesh, GL_DYNAMIC_DRAW, true, true, false);
 
 #ifdef DEBUG_GL_ERRORS
-			ss.clear();
-			ss << "GL Error 1c3 = " << glGetError() << std::endl;
+			ss.clear(); result = glGetError();
+			ss << "GL Error 1c3 = " << result << std::endl;
 			ss << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
-			ofLogNotice(ss.str());
+			if(result != 0) ofLogNotice( ss.str() );
 #endif // DEBUG_GL_ERRORS
 			
 			parameters.setName("velocity dots");

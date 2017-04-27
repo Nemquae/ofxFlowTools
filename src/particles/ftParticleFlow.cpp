@@ -188,9 +188,9 @@ namespace flowTools {
 	
 	void ftParticleFlow::draw(int _x, int _y, int _width, int _height) {
 #ifdef DEBUG_GL_ERRORS
-        std::stringstream ss;
-        ss << "GL Error 12 = " << glGetError() << std::endl;
-        ofLogNotice(ss.str());
+        std::stringstream ss; GLint result = glGetError();
+        ss << "GL Error 12 = " << result << std::endl;
+        if(result != 0) ofLogNotice( ss.str() );
 #endif // DEBUG_GL_ERRORS
         
 		ofPushView();

@@ -266,9 +266,9 @@ namespace flowTools {
 		void update(ofVboMesh &particleVbo, int _numParticles, ofTexture& _positionTexture, ofTexture& _ALMSTexture, float _twinkleSpeed, ofVec3f _color){
             
 #ifdef DEBUG_GL_ERRORS
-            std::stringstream ss;
-            ss << "GL Error 13 = " << glGetError() << std::endl;
-            ofLogNotice(ss.str());
+            std::stringstream ss; GLint result = glGetError();
+            ss << "GL Error 13 = " << result << std::endl;
+            if(result != 0) ofLogNotice( ss.str() );
 #endif // DEBUG_GL_ERRORS
 
             
@@ -279,10 +279,10 @@ namespace flowTools {
 			shader.setUniform3f("Color", _color);
             
 #ifdef DEBUG_GL_ERRORS
-            ss.clear();
-            ss << "GL Error 14 = " << glGetError() << std::endl;
+            ss.clear(); result = glGetError();
+            ss << "GL Error 14 = " << result << std::endl;
             //ss << gluErrorString() << std::endl;
-            ofLogNotice(ss.str());
+            if(result != 0) ofLogNotice( ss.str() );
 #endif // DEBUG_GL_ERRORS
 
 			
@@ -295,18 +295,18 @@ namespace flowTools {
             #endif
             
 #ifdef DEBUG_GL_ERRORS
-            ss.clear();
-            ss << "GL Error 15a = " << glGetError() << std::endl;
-            ofLogNotice(ss.str());
+            ss.clear(); result = glGetError();
+            ss << "GL Error 15a = " << result << std::endl;
+            if(result != 0) ofLogNotice( ss.str() );
 #endif // DEBUG_GL_ERRORS
 
 			
 			particleVbo.draw();
 
 #ifdef DEBUG_GL_ERRORS
-			ss.clear();
-			ss << "GL Error 15b = " << glGetError() << std::endl;
-			ofLogNotice( ss.str() );
+			ss.clear(); result = glGetError();
+			ss << "GL Error 15b = " << result << std::endl;
+			if(result != 0) ofLogNotice( ss.str() );
 #endif // DEBUG_GL_ERRORS
 
 			
@@ -318,9 +318,9 @@ namespace flowTools {
             #endif
 
 #ifdef DEBUG_GL_ERRORS
-			ss.clear();
-			ss << "GL Error 15c = " << glGetError() << std::endl;
-			ofLogNotice( ss.str() );
+			ss.clear(); result = glGetError();
+			ss << "GL Error 15c = " << result << std::endl;
+			if(result != 0) ofLogNotice( ss.str() );
 #endif // DEBUG_GL_ERRORS
 
 
@@ -328,9 +328,9 @@ namespace flowTools {
 			shader.end();
             
 #ifdef DEBUG_GL_ERRORS
-            ss.clear();
-            ss << "GL Error 16 = " << glGetError() << std::endl;
-            ofLogNotice(ss.str());
+            ss.clear(); result = glGetError();
+            ss << "GL Error 16 = " << result << std::endl;
+            if(result != 0) ofLogNotice( ss.str() );
 #endif // DEBUG_GL_ERRORS
 
 			
